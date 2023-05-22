@@ -8,6 +8,8 @@ Mỗi bài tập sẽ lưu trên file sol-{number}.sql
 
 https://leetcode.com/problems/capital-gainloss/description/ (gợi ý: sử dụng CASE)
 
+https://leetcode.com/problems/count-salary-categories/ (ngoài các cách trên leetcode, hãy nghĩ cách để giúp câu query này nhanh hơn, kể cả thay đổi cấu trúc bản)
+
 2. Bạn hãy viết một script để tạo các bản cho hệ thống với cấu trúc ở dưới
 
 ![img.png](img.png)
