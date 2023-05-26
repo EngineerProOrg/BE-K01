@@ -1,0 +1,7 @@
+select t.stock_name as stock_name, sum(t.capital_gain_loss) as capital_gain_loss
+from 
+(select
+ stock_name,
+ case when operation = 'Sell' then price else 0-price end as capital_gain_loss
+ from stocks) t
+ group by t.stock_name;
