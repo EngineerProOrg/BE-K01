@@ -1,4 +1,4 @@
-# 1. CTE [Best performance]
+# 1. CTE
 WITH T1 AS (
     SELECT 'Low Salary' AS category
     UNION ALL
@@ -14,7 +14,7 @@ T2 AS (SELECT
 FROM accounts
 GROUP BY category)
 
-SELECT T1.category, CASE WHEN accounts_count IS NULL THEN 0 ELSE accounts_count END AS accounts_count
+SELECT T1.category, COALESCE(accounts_count, 0) AS accounts_count
 FROM T1 LEFT JOIN T2 ON T1.category = T2.category;
 
 # 2. Sub query
