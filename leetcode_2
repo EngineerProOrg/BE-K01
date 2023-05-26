@@ -1,20 +1,79 @@
-select "Low Salary" as category,
-sum(case when income < 20000 then 1 else 0 end) as accounts_count 
-from accounts
-where income < 20000
-group by "Low Salary"
+# 1. CTE [Best performance]
+WITH T1 AS (
+    SELECT 'Low Salary' AS category
+    UNION ALL
+    SELECT 'Average Salary' AS category
+    UNION ALL
+    SELECT 'High Salary' AS category),
 
-union all
+T2 AS (SELECT 
+       CASE WHEN income < 20000 THEN 'Low Salary'
+            WHEN income > 50000 THEN 'High Salary'
+            ELSE 'Average Salary' END AS category,
+       COUNT(account_id) AS accounts_count
+FROM accounts
+GROUP BY category)
 
-select "High Salary" as category,
-sum(case when income > 50000 then 1 else 0 end) as accounts_count 
-from accounts
-where income > 50000
-group by "High Salary"
+SELECT T1.category, CASE WHEN accounts_count IS NULL THEN 0 ELSE accounts_count END AS accounts_count
+FROM T1 LEFT JOIN T2 ON T1.category = T2.category;
 
-union all
+# 2. Sub query
+###############################################
+# select T1.category,
+# CASE WHEN accounts_count IS NULL THEN 0 ELSE accounts_count END AS accounts_count
+# from 
+# (SELECT 'Low Salary' AS category
+#   UNION
+#   SELECT 'Average Salary' AS category
+#   UNION
+#   SELECT 'High Salary' AS category) T1
+# LEFT JOIN 
+# (SELECT 
+#        CASE WHEN income < 20000 THEN 'Low Salary'
+#             WHEN income > 50000 THEN 'High Salary'
+#             ELSE 'Average Salary' END AS category,
+#        COUNT(account_id) AS accounts_count
+# FROM accounts
+# GROUP BY category) T2
+# ON T1.category = T2.category;
 
-select "Average Salary" as category,
-sum(case when income >= 20000 and income <= 50000 then 1 else 0 end) as accounts_count 
-from accounts
-group by "Average Salary";
+
+# 3. Simple count()
+###############################################
+# select "Low Salary" as category,
+# count(account_id) as accounts_count
+# from accounts
+# where income < 20000
+
+# union all
+# select "High Salary" as category,
+# count(account_id) as accounts_count
+# from accounts
+# where income > 50000
+
+# union all
+# select "Average Salary" as category,
+# count(account_id) as accounts_count
+# from accounts
+# where income <= 50000 and income >= 20000;
+
+
+# 4. Sum(1)
+###############################################
+# select "Low Salary" as category,
+# sum(case when income < 20000 then 1 else 0 end) as accounts_count 
+# from accounts
+# group by "Low Salary"
+
+# union all
+# select "High Salary" as category,
+# sum(case when income > 50000 then 1 else 0 end) as accounts_count 
+# from accounts
+# group by "High Salary"
+
+# union all
+# select "Average Salary" as category,
+# sum(case when income >= 20000 and income <= 50000 then 1 else 0 end) as accounts_count 
+# from accounts
+# group by "Average Salary";
+
