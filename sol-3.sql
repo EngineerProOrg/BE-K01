@@ -22,7 +22,7 @@ where
 
 -- Những course (distinct) mà 1 student cụ thể đang học
 select
-    distinct class_id
+    distinct course_id
 from
     Enroll
     join Class using (class_id)
