@@ -9,9 +9,9 @@ package assignment_1_gorm
 //
 // );
 type Professor struct {
-	ID        uint32 `gorm:"column:prof_id;type:int(32);primary_key;auto_increment" json:"prof_id"`
-	FirstName string `gorm:"column:prof_fname;type:varchar(50)" json:"prof_fname"`
-	LastName  string `gorm:"column:prof_lname;type:varchar(50)" json:"prof_lname"`
+	ID        uint32 `gorm:"column:prof_id;type:int(32);primary_key;auto_increment"`
+	FirstName string `gorm:"column:prof_fname;type:varchar(50)"`
+	LastName  string `gorm:"column:prof_lname;type:varchar(50)"`
 }
 
 func (Professor) TableName() string {
@@ -30,12 +30,12 @@ func (Professor) TableName() string {
 //
 // );
 type Student struct {
-	ID        uint32 `gorm:"column:stud_id;type:int(32);primary_key;auto_increment" json:"stud_id"`
-	FirstName string `gorm:"column:stud_fname;type:varchar(50)" json:"stud_fname"`
-	LastName  string `gorm:"column:stud_lname;type:varchar(50)" json:"stud_lname"`
-	Street    string `gorm:"column:stud_street;type:varchar(255)" json:"stud_street"`
-	City      string `gorm:"column:stud_city;type:varchar(50)" json:"stud_city"`
-	Zip       string `gorm:"column:stud_zip;type:varchar(10)" json:"stud_zip"`
+	ID        uint32 `gorm:"column:stud_id;type:int(32);primary_key;auto_increment"`
+	FirstName string `gorm:"column:stud_fname;type:varchar(50)"`
+	LastName  string `gorm:"column:stud_lname;type:varchar(50)"`
+	Street    string `gorm:"column:stud_street;type:varchar(255)"`
+	City      string `gorm:"column:stud_city;type:varchar(50)"`
+	Zip       string `gorm:"column:stud_zip;type:varchar(10)"`
 }
 
 func (Student) TableName() string {
@@ -50,8 +50,8 @@ func (Student) TableName() string {
 //
 // );
 type Course struct {
-	ID   uint32 `gorm:"column:course_id;type:int(32);primary_key;auto_increment" json:"course_id"`
-	Name string `gorm:"column:course_name;type:varchar(255)" json:"course_name"`
+	ID   uint32 `gorm:"column:course_id;type:int(32);primary_key;auto_increment"`
+	Name string `gorm:"column:course_name;type:varchar(255)"`
 }
 
 func (Course) TableName() string {
@@ -73,12 +73,12 @@ func (Course) TableName() string {
 //
 // );
 type Class struct {
-	ID          uint32 `gorm:"column:class_id;type:int(32);primary_key;auto_increment" json:"class_id"`
-	Name        string `gorm:"column:class_name;type:varchar(255)" json:"class_name"`
-	ProfessorID uint32 `gorm:"column:prof_id;type:int(32)" json:"prof_id"`
-	CourseID    uint32 `gorm:"column:course_id;type:int(32)" json:"course_id"`
-	RoomLoc     string `gorm:"column:room_loc;type:varchar(50)" json:"room_loc"`
-	RoomCap     string `gorm:"column:room_cap;type:varchar(50)" json:"room_cap"`
+	ID          uint32 `gorm:"column:class_id;type:int(32);primary_key;auto_increment"`
+	Name        string `gorm:"column:class_name;type:varchar(255)"`
+	ProfessorID uint32 `gorm:"column:prof_id;type:int(32)"`
+	CourseID    uint32 `gorm:"column:course_id;type:int(32)"`
+	RoomLoc     string `gorm:"column:room_loc;type:varchar(50)"`
+	RoomCap     string `gorm:"column:room_cap;type:varchar(50)"`
 
 	Professor Professor `gorm:"foreign_key:prof_id;references:prof_id"`
 	Course    Course    `gorm:"foreign_key:course_id;references:course_id"`
@@ -99,9 +99,9 @@ func (Class) TableName() string {
 //
 // );
 type Enroll struct {
-	StudentID int    `gorm:"column:stud_id;type:int(32);primary_key" json:"stud_id"`
-	ClassID   int    `gorm:"column:class_id;type:int(32);primary_key" json:"class_id"`
-	Grade     string `gorm:"column:grade;type:varchar(3)" json:"grade"`
+	StudentID int    `gorm:"column:stud_id;type:int(32);primary_key"`
+	ClassID   int    `gorm:"column:class_id;type:int(32);primary_key"`
+	Grade     string `gorm:"column:grade;type:varchar(3)"`
 
 	Student Student `gorm:"foreign_key:stud_id;references:stud_id"`
 	Class   Class   `gorm:"foreign_key:class_id;references:class_id"`
