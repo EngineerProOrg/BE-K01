@@ -1,0 +1,112 @@
+-- query for engineerpro db
+
+-- 1. 
+USE engineerpro;
+SELECT 
+	CONCAT(stud_fname, " ", stud_lname) as stud_name,
+    CONCAT(prof_fname, " ", prof_lname) as prof_name, 
+    cl.class_id
+FROM Professor pr
+JOIN Class cl -- class of prof
+	ON pr.prof_id = cl.prof_id
+JOIN Enroll en -- make sure that classes have been enrolled
+	ON en.class_id = cl.class_id 
+JOIN Student st -- make sure the stud has been enrolled
+	ON en.stud_id = st.stud_id;
+    
+-- 2
+SELECT 
+	DISTINCT course_name,
+	CONCAT(prof_fname, " ", prof_lname) as prof_name
+FROM Professor pr
+JOIN Class cl
+	ON pr.prof_id = cl.prof_id
+JOIN Course cr
+	ON cr.course_id = cl.course_id;
+    
+-- 3
+SELECT 
+	course_name,
+	CONCAT(stud_fname, " ", stud_lname) as stud_name
+FROM Student st
+JOIN Enroll en
+	ON st.stud_id = en.stud_id
+JOIN Class cl
+	ON cl.class_id = en.class_id
+JOIN Course cr
+	ON cr.course_id = cl.course_id;
+    
+-- 4
+SELECT 
+(
+CASE
+	WHEN grade = 'A' THEN 10
+	WHEN grade = 'B' THEN 8
+	WHEN grade = 'C' THEN 6
+	WHEN grade = 'D' THEN 4
+	WHEN grade = 'E' THEN 2
+	WHEN grade = 'F' THEN 0
+END
+) as grade
+FROM Enroll;
+
+-- 5
+SELECT
+	CONCAT(stud_fname, " ", stud_lname) as stud_name,
+	AVG(
+	CASE
+		WHEN grade = 'A' THEN 10
+		WHEN grade = 'B' THEN 8
+		WHEN grade = 'C' THEN 6
+		WHEN grade = 'D' THEN 4
+		WHEN grade = 'E' THEN 2
+        WHEN grade = 'F' THEN 0
+	END
+	) as academic_ability
+FROM Enroll en
+JOIN Student st
+	ON st.stud_id = en.stud_id
+GROUP BY CONCAT(stud_fname, " ", stud_lname);
+
+-- 6
+SELECT 
+	class_name,
+    AVG(
+	CASE
+		WHEN grade = 'A' THEN 10
+		WHEN grade = 'B' THEN 8
+		WHEN grade = 'C' THEN 6
+		WHEN grade = 'D' THEN 4
+		WHEN grade = 'E' THEN 2
+        WHEN grade = 'F' THEN 0
+	END
+	) as grade
+FROM Enroll en
+JOIN Class cl
+	ON cl.class_id = en.class_id
+GROUP BY class_name;
+-- 7
+SELECT 
+	course_name,
+    AVG(
+	CASE
+		WHEN grade = 'A' THEN 10
+		WHEN grade = 'B' THEN 8
+		WHEN grade = 'C' THEN 6
+		WHEN grade = 'D' THEN 4
+		WHEN grade = 'E' THEN 2
+        WHEN grade = 'F' THEN 0
+	END
+	) as grade
+FROM Enroll en
+JOIN Class cl
+	ON cl.class_id = en.class_id
+JOIN Course cr
+	ON cr.course_id = cl.class_id
+GROUP BY course_name;
+
+	
+
+
+
+
