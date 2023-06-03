@@ -14,7 +14,14 @@ type Professor struct {
 	ProfId    int32  `gorm:"prof_id"`
 	ProfLname string `gorm:"prof_lname"`
 	ProfFname string `gorm:"prof_fname"`
+	StudLname string `gorm:"stud_lname"`
+	StudFname string `gorm:"stud_fname"`
 	NumClass  int32  `gorm:"num_class"`
+}
+
+type Cource struct {
+	CourseId   int32  `gorm:"course_id"`
+	CourseName string `gorm:"course_name"`
 }
 
 func responseError(c *gin.Context, err string) {
@@ -28,28 +35,24 @@ func getProfessors(db *gorm.DB) func(*gin.Context) {
 		var data []Professor
 
 		err := db.Table("professors as p").
-			Select("p.prof_id, p.prof_lname, p.prof_fname, COUNT(p.prof_id) as num_class").
+			Select("p.prof_id, p.prof_lname, p.prof_fname, s.stud_lname, s.stud_fname,COUNT(*) as num_class").
 			Joins("JOIN classes as c ON c.prof_id = p.prof_id").
 			Joins("JOIN enrolls as e ON c.class_id = e.class_id").
 			Joins("JOIN students as s ON s.stud_id = e.stud_id").
-			Group("p.prof_id").
+			Group("p.prof_id, s.stud_id").
 			Find(&data).Error
 		if err != nil {
 			responseError(c, err.Error())
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"data": data,
-		})
-	}
-}
-
-func main() {
-
-	// connect to mysql
+	r := gin.Default()
+	r.GET("/ping", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
+	})
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       "root:12345@tcp(127.0.0.1:3305)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
+		DSN:                       "root:12345@tcp(127.0.0.1:3301)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
 		DefaultStringSize:         256,
 		DisableDatetimePrecision:  true,
 		DontSupportRenameIndex:    true,
