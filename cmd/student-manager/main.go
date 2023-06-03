@@ -46,13 +46,37 @@ func getProfessors(db *gorm.DB) func(*gin.Context) {
 			return
 		}
 
-	r := gin.Default()
-	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
-	})
+		c.JSON(http.StatusOK, gin.H{
+			"data": data,
+		})
+	}
+}
+
+func getCourceDistinct(db *gorm.DB) func(*gin.Context) {
+	return func(c *gin.Context) {
+		var data []Cource
+		err := db.Table("courses as c").
+			Select("c.*").
+			Joins("JOIN classes as cl ON c.course_id = cl.course_id").
+			Joins("JOIN professors as p ON p.prof_id = cl.prof_id").
+			Where("p.prof_id = ? ", 1).
+			Find(&data).Error
+
+		if err != nil {
+			responseError(c, err.Error())
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data": data,
+		})
+	}
+}
+
+func main() {
+	// connect to mysql
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       "root:12345@tcp(127.0.0.1:3305)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
-		DSN:                       "root:12345@tcp(127.0.0.1:3301)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
 		DefaultStringSize:         256,
 		DisableDatetimePrecision:  true,
 		DontSupportRenameIndex:    true,
@@ -67,24 +91,16 @@ func getProfessors(db *gorm.DB) func(*gin.Context) {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-	// config := &configs.StudentManagerConfig{}
-	// jsonFile, err := os.Open("users.json")
-	// // if we os.Open returns an error then handle it
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// defer jsonFile.Close()
-	// bt, err := io.ReadAll(jsonFile)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// err = json.Unmarshal(bt, config)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+
+	if err != nil {
+		fmt.Println("can not connect to db ", err)
+		return
+	}
+
+	if rd == nil {
+		fmt.Println("connect fail to redis")
+		return
+	}
 
 	r := gin.Default()
 
@@ -97,19 +113,7 @@ func getProfessors(db *gorm.DB) func(*gin.Context) {
 	})
 
 	r.GET("/professor", getProfessors(db))
+	r.GET("/courses", getCourceDistinct(db))
 
-	if err != nil {
-		fmt.Println("can not connect to db ", err)
-		return
-	}
-
-	if rd == nil {
-		fmt.Println("connect fail to redis")
-		return
-	}
-
-	// ab := service.GetProfessor(1)
-	// print(ab)
-	// MappingService(r, service)
 	r.Run()
 }
