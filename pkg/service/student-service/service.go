@@ -1,4 +1,4 @@
-package service
+package student_service
 
 import (
 	"github.com/EngineerProOrg/BE-K01/pkg/repository"
@@ -11,6 +11,7 @@ type StudentManagerService interface {
 	GetStudent(id int64) interface{}
 	GetProfessor(id int64) interface{}
 }
+
 type studentManagerService struct {
 	repo  repository.StudentRepository
 	redis *redis.Client

@@ -9,3 +9,7 @@ type Student struct {
 	FirstName string `gorm:"first_name"`
 	LastName  string `gorm:"last_name"`
 }
+
+func (Student) TableName() string {
+	return "student"
+}

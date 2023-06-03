@@ -4,17 +4,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
-
 	"github.com/EngineerProOrg/BE-K01/configs"
-	"github.com/EngineerProOrg/BE-K01/pkg/controller"
-	"github.com/EngineerProOrg/BE-K01/pkg/service"
+	cache_service "github.com/EngineerProOrg/BE-K01/pkg/service/cache-service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"io"
+	"os"
 )
 
 var (
@@ -23,7 +20,7 @@ var (
 
 func main() {
 	config := &configs.StudentManagerConfig{}
-	jsonFile, err := os.Open("users.json")
+	jsonFile, err := os.Open("configs/files/live.json")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
@@ -41,12 +38,8 @@ func main() {
 		return
 	}
 
-	r := gin.Default()
-	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
-	})
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       "root:123456@tcp(127.0.0.1:3306)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
+	_, err = gorm.Open(mysql.New(mysql.Config{
+		DSN:                       config.DB.Addr,
 		DefaultStringSize:         256,
 		DisableDatetimePrecision:  true,
 		DontSupportRenameIndex:    true,
@@ -55,14 +48,23 @@ func main() {
 		SkipDefaultTransaction: true,
 	})
 	if err != nil {
-		fmt.Println("can not connect to db ", err)
+		fmt.Printf("can not connect to db :%v\n", err)
 		return
 	}
-	rd := redis.NewClient(&redis.Options{})
+
+	rd := redis.NewClient(&redis.Options{
+		Addr:     config.Redis.Addr,
+		Password: "",
+		DB:       0,
+	})
 	if rd == nil {
+		fmt.Printf("can not connect to redis :%v\n", err)
 		return
 	}
-	service := service.NewService(db, rd)
-	controller.MappingService(r, service)
-	r.Run()
+
+	r := gin.Default()
+
+	cache_service.MappingService(r, cache_service.NewService(rd))
+
+	r.Run("localhost:3050")
 }
