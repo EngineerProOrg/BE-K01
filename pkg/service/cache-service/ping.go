@@ -58,34 +58,25 @@ func (s *cacheService) Ping(sessionId string) error {
 	}
 
 	ctx = context.Background()
-	r3, err := s.redis.Incr(ctx, fmt.Sprintf("ping-%s", sessionId)).Result()
+	sessionPingCount, err := s.redis.Incr(ctx, PingSessionKey(sessionId)).Result()
 	if err != nil {
 		return fmt.Errorf("unable to increment ping count")
 	}
 
 	ctx = context.Background()
-	_, err = s.redis.ZAdd(ctx, "ping-scoreboard", &redis.Z{
-		Score:  float64(r3),
+	err = s.redis.ZAdd(ctx, PING_SCOREBOARD, &redis.Z{
+		Score:  float64(sessionPingCount),
 		Member: userName,
-	}).Result()
+	}).Err()
 	if err != nil {
 		return fmt.Errorf("unable to update scoreboard")
 	}
 
 	ctx = context.Background()
-	_, err = s.redis.PFAdd(ctx, "ping-total", userName).Result()
+	err = s.redis.PFAdd(ctx, PING_TOTAL, userName).Err()
 	if err != nil {
 		return fmt.Errorf("unable to update total")
 	}
 
 	return nil
-}
-
-func (s *cacheService) Top10Ping() ([]string, error) {
-	ctx := context.Background()
-	r, err := s.redis.ZRevRange(ctx, "ping-scoreboard", 0, 9).Result()
-	if err != nil {
-		return []string{}, err
-	}
-	return r, nil
 }

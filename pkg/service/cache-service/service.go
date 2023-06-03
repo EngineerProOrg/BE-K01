@@ -12,6 +12,8 @@ type CacheService interface {
 	Login(userName string) (string, error)
 	Ping(sessionId string) error
 	Top10Ping() ([]string, error)
+	Count() (int64, error)
+	CountBySessionId(sessionId string) (int64, error)
 }
 
 type cacheService struct {
@@ -60,12 +62,31 @@ func MappingService(r *gin.Engine, service CacheService) {
 		c.JSON(http.StatusOK, gin.H{"message": "ok"})
 	})
 
-	r.GET("/ping/top10", func(c *gin.Context) {
+	r.GET("/top", func(c *gin.Context) {
 		result, err := service.Top10Ping()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"scoreboard": result})
+	})
+
+	r.GET("/count", func(c *gin.Context) {
+		result, err := service.Count()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"count": result})
+	})
+
+	r.GET("/count/:sessionId", func(c *gin.Context) {
+		sessionId := c.Param("sessionId")
+		result, err := service.CountBySessionId(sessionId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"count": result})
 	})
 }
