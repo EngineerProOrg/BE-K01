@@ -1,8 +1,8 @@
 {
   "db": {
-    "addr": ""
+    "addr": "root:@tcp(127.0.0.1:3306)/Ex01?charset=utf8mb4&parseTime=True&loc=Local"
   },
   "redis": {
-    "addr": ""
+    "addr": "127.0.0.1:6379"
   }
 }
