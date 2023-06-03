@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/EngineerProOrg/BE-K01/configs"
-	"github.com/EngineerProOrg/BE-K01/pkg/controller"
 	"github.com/EngineerProOrg/BE-K01/pkg/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -62,7 +61,7 @@ func main() {
 	if rd == nil {
 		return
 	}
-	service := service.NewService(db, rd)
-	controller.MappingService(r, service)
+	s := service.NewService(db, rd)
+	service.MappingService(r, s)
 	r.Run()
 }
