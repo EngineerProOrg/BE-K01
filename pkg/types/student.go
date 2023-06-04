@@ -1,11 +1,10 @@
 package types
 
-import (
-	"gorm.io/gorm"
-)
-
 type Student struct {
-	gorm.Model
-	FirstName string `gorm:"first_name"`
-	LastName  string `gorm:"last_name"`
+	StudID     int    `gorm:"primaryKey;autoIncrement"`
+	StudFName  string `gorm:"column:stud_fname"`
+	StudLName  string `gorm:"column:stud_lname"`
+	StudStreet string `gorm:"column:stud_street"`
+	StudCity   string `gorm:"column:stud_city"`
+	StudZip    string `gorm:"column:stud_zip"`
 }
