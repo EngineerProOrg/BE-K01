@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	"gorm.io/driver/mysql"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -110,12 +110,12 @@ func login(c *gin.Context) {
 }
 
 var keyApiPing = "user_accessing"
+var keyCallApi = "call_ping"
 
 // API /ping chỉ cho phép 1 người được gọi tại một thời điểm ( với sleep ở bên trong api đó trong 5s)
 func ping(c *gin.Context) {
-	ctx := context.Background()
-
-	exists, err := rd.Exists(ctx, keyApiPing).Result()
+	id := uuid.New()
+	exists, err := rd.Exists(rd.Context(), keyApiPing).Result()
 	if err != nil {
 		fmt.Println("error ", err)
 		return
@@ -123,12 +123,12 @@ func ping(c *gin.Context) {
 
 	// check nếu đang tồn tại key thì sleep  5 - ttl của key
 	if exists == 1 {
-		ttl, err := rd.TTL(ctx, keyApiPing).Result()
+		fmt.Println("wait")
+		ttl, err := rd.TTL(rd.Context(), keyApiPing).Result()
 		if err != nil {
 			fmt.Println("Lỗi khi lấy TTL:", err)
 			return
 		}
-		fmt.Printf("ttl %d", ttl)
 		if ttl > 0 {
 			waitTime := time.Duration(ttl)
 			fmt.Printf("wait %d minutes", ttl)
@@ -136,7 +136,9 @@ func ping(c *gin.Context) {
 		}
 	} else {
 		// khi vào, tạo một key trong redis set time 5s
-		err := rd.SetNX(ctx, keyApiPing, "1", 5*time.Second).Err()
+		// lock
+		fmt.Println("lock")
+		err := rd.SetNX(rd.Context(), keyApiPing, id, 5*time.Second).Err()
 		if err != nil {
 			return
 		}
@@ -144,26 +146,35 @@ func ping(c *gin.Context) {
 
 	// return resource
 	fmt.Println("Access resource")
+
+	// release lock
+	val, errGet := rd.Get(rd.Context(), keyApiPing).Result()
+	if errGet == nil && val == id.String() {
+		fmt.Println("release")
+		rd.Del(rd.Context(), keyApiPing)
+	}
 }
+
+// rate limit mỗi người chỉ được gọi API /ping 2 lần trong 60s 1
 
 func main() {
 	// connect to mysql
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       "root:12345@tcp(127.0.0.1:3305)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
-		DefaultStringSize:         256,
-		DisableDatetimePrecision:  true,
-		DontSupportRenameIndex:    true,
-		SkipInitializeWithVersion: false,
-	}), &gorm.Config{
-		SkipDefaultTransaction: true,
-	})
+	// db, err := gorm.Open(mysql.New(mysql.Config{
+	// 	DSN:                       "root:12345@tcp(127.0.0.1:3305)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
+	// 	DefaultStringSize:         256,
+	// 	DisableDatetimePrecision:  true,
+	// 	DontSupportRenameIndex:    true,
+	// 	SkipInitializeWithVersion: false,
+	// }), &gorm.Config{
+	// 	SkipDefaultTransaction: true,
+	// })
 
 	// connect to redis
 
-	if err != nil {
-		fmt.Println("can not connect to db ", err)
-		return
-	}
+	// if err != nil {
+	// 	fmt.Println("can not connect to db ", err)
+	// 	return
+	// }
 
 	if rd == nil {
 		fmt.Println("connect fail to redis")
@@ -172,8 +183,8 @@ func main() {
 
 	r := gin.Default()
 
-	r.GET("/professor", getProfessors(db))
-	r.GET("/courses", getCourceDistinct(db))
+	// r.GET("/professor", getProfessors(db))
+	// r.GET("/courses", getCourceDistinct(db))
 
 	// Bai tap redis
 	r.POST("/login", login)
