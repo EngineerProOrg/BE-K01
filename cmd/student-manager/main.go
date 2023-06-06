@@ -110,12 +110,21 @@ func login(c *gin.Context) {
 }
 
 var keyApiPing = "user_accessing"
+var keyCallApi = "call_ping"
+var keySt = "caller_top"
+var keyLog = "log_call_ping"
 
 // API /ping chỉ cho phép 1 người được gọi tại một thời điểm ( với sleep ở bên trong api đó trong 5s)
 func ping(c *gin.Context) {
-	ctx := context.Background()
+	id := "user_123"
+	// count ping api
+	setCountPingApi(keySt, id)
+	logCallPing(id)
+	// end count
 
-	exists, err := rd.Exists(ctx, keyApiPing).Result()
+	// set
+
+	exists, err := rd.Exists(rd.Context(), keyApiPing).Result()
 	if err != nil {
 		fmt.Println("error ", err)
 		return
@@ -123,12 +132,12 @@ func ping(c *gin.Context) {
 
 	// check nếu đang tồn tại key thì sleep  5 - ttl của key
 	if exists == 1 {
-		ttl, err := rd.TTL(ctx, keyApiPing).Result()
+		fmt.Println("wait")
+		ttl, err := rd.TTL(rd.Context(), keyApiPing).Result()
 		if err != nil {
 			fmt.Println("Lỗi khi lấy TTL:", err)
 			return
 		}
-		fmt.Printf("ttl %d", ttl)
 		if ttl > 0 {
 			waitTime := time.Duration(ttl)
 			fmt.Printf("wait %d minutes", ttl)
@@ -136,14 +145,107 @@ func ping(c *gin.Context) {
 		}
 	} else {
 		// khi vào, tạo một key trong redis set time 5s
-		err := rd.SetNX(ctx, keyApiPing, "1", 5*time.Second).Err()
-		if err != nil {
-			return
-		}
+		// lock
+		fmt.Println("lock")
+		lockCallApi(id)
 	}
 
 	// return resource
 	fmt.Println("Access resource")
+
+	// release lock
+	val, errGet := rd.Get(rd.Context(), keyApiPing).Result()
+	if errGet == nil && val == id.String() {
+		fmt.Println("release")
+		rd.Del(rd.Context(), keyApiPing)
+	}
+}
+
+func lockCallApi(id string) bool {
+	for {
+		result, err := rd.SetNX(rd.Context(), keyApiPing, id, 5*time.Second).Result()
+
+		if err != nil {
+			fmt.Println("Err set key: ", err)
+		}
+
+		if result {
+			fmt.Println("Set key success !!")
+			break
+		}
+	}
+}
+
+// rate limit mỗi người chỉ được gọi API /ping 2 lần trong 60s 1
+func rateLimit(c *gin.Context) {
+	rateLimitKey := "rate_limit:ping:"
+
+	userId := "user_1"
+	count, err := rd.Incr(rd.Context(), rateLimitKey+userId).Result()
+	if err != nil {
+		fmt.Println("Error checking rate limit:", err)
+		return
+	}
+
+	if count == 1 {
+		err := rd.Expire(rd.Context(), rateLimitKey+userId, 60*time.Second).Err()
+		if err != nil {
+			fmt.Println("Error setting rate limit expiry:", err)
+			return
+		}
+	}
+
+	if count > 2 {
+		fmt.Println("Rate limit !!")
+		return
+	}
+
+	fmt.Println("API /ping accessed")
+
+	err = rd.Close()
+	if err != nil {
+		fmt.Println("Error closing Redis client:", err)
+		return
+	}
+}
+
+// API /top/ trả về top 10 người gọi API /ping nhiều nhất
+func getTop10(c *gin.Context) {
+	results, err := rd.ZRevRangeWithScores(rd.Context(), keySt, 0, 9).Result()
+	if err != nil {
+		fmt.Println("Error retrieving top callers:", err)
+		return
+	}
+	return results
+}
+
+func setCountPingApi(keySt string, userId string) bool {
+	err := rd.ZIncrBy(rd.Context(), keySt, 1, userId).Err()
+	if err != nil {
+		fmt.Println("Error incrementing caller count:", err)
+		return false
+	}
+	return true
+}
+
+// api save hyperloglog
+func logCallPing(username string) bool {
+
+	if err := rd.PFAdd(rd.Context(), keyLog, username).Err(); err != nil {
+		fmt.Println("Err, ", err)
+		return false
+	}
+
+	return true
+}
+
+func countLogCallPing(c *gin.Context) {
+	count, err := rd.PFCount(rd.Context(), keyLog).Result()
+	if err != nil {
+		fmt.Println("Err", err)
+		return
+	}
+	fmt.Println("Count log: ", count)
 }
 
 func main() {
@@ -178,6 +280,9 @@ func main() {
 	// Bai tap redis
 	r.POST("/login", login)
 	r.GET("/ping", ping)
+	r.GET("/rate_limit", rateLimit)
+	r.GET("/top", getTop10)
+	r.GET("/count", countLogCallPing)
 
 	r.Run()
 }
