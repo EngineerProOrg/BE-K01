@@ -5,7 +5,6 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +12,9 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 )
 
 const (
@@ -23,20 +25,20 @@ const (
 	MaxPingPerUser       = 2
 	PingRateLimit        = 60
 	TopPingCount         = 10
+	MutexName            = "pingLock"
 )
 
 var (
 	db          *gorm.DB
 	router      *gin.Engine
 	redisClient *redis.Client
-	mu          sync.Mutex
+	mu          *redsync.Mutex
 )
 
 func init() {
 	initDatabase()
 	initRedis()
 	initRouter()
-	mu = sync.Mutex{}
 }
 
 // initDatabase initializes the database
@@ -64,6 +66,16 @@ func initRedis() {
 		fmt.Println("Can not initialize redis")
 		return
 	}
+
+	// Create a pool with go-redis which is the pool redsync will use while
+	// communicating with Redis
+	redisPool := goredis.NewPool(redisClient)
+
+	// Create an instance of redsync to be used to obtain a mutual exclusion lock
+	rs := redsync.New(redisPool)
+
+	// Obtain a new mutex by using the same name for all instances wanting the same lock
+	mu = rs.NewMutex(MutexName)
 }
 
 // initRouter initializes the gin router
@@ -131,7 +143,7 @@ func handleLogin(c *gin.Context) {
 
 // handlePing allows just one user calls at a time
 func handlePing(c *gin.Context) {
-	// Acquire the lock
+	// Acquire the distributed lock
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -174,16 +186,8 @@ func handlePing(c *gin.Context) {
 
 // đếm số lượng lần 1 người gọi api /ping
 func increaseCounter(username string) {
-	totalPing, _ := redisClient.ZScore(redisClient.Context(), RedisTopPingKey, username).Result()
-	err := redisClient.ZAdd(redisClient.Context(), RedisTopPingKey, &redis.Z{Score: totalPing + 1, Member: username}).Err()
-	if err != nil {
-		panic(err)
-	}
-
-	err = redisClient.PFAdd(redisClient.Context(), RedisHyperLogLogKey, username).Err()
-	if err != nil {
-		panic(err)
-	}
+	redisClient.ZIncrBy(redisClient.Context(), RedisTopPingKey, float64(1), username)
+	redisClient.PFAdd(redisClient.Context(), RedisHyperLogLogKey, username)
 }
 
 func canMakePing(username string) bool {
