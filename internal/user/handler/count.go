@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/EngineerProOrg/BE-K01/tools/redis"
 	"github.com/gin-gonic/gin"
 )
 
@@ -9,8 +8,7 @@ import (
 
 func (hdl *userHandler) CountHyperLogLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		redisClient := redis.NewRedisClient()
-		count := redisClient.PFCount(ctx, "membersCallPingAPI").Val()
+		count := hdl.redis.PFCount(ctx, "membersCallPingAPI").Val()
 		ctx.JSON(200, gin.H{"count": count})
 	}
 	

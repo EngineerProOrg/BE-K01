@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/redis/go-redis/v9"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,8 +15,9 @@ type UserHandler interface {
 
 }
 type userHandler struct {
+	redis *redis.Client
 }
 
-func NewUserHandler() UserHandler {
-	return &userHandler{}
+func NewUserHandler(redis *redis.Client) UserHandler {
+	return &userHandler{redis: redis}
 }

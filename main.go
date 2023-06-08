@@ -3,11 +3,13 @@ package main
 import(
 	"github.com/gin-gonic/gin"
 	"github.com/EngineerProOrg/BE-K01/internal/user/handler"
+	"github.com/EngineerProOrg/BE-K01/tools/redis"
 )
 func main() {
 	router := gin.Default()
 
-	userHdl := handler.NewUserHandler()
+	redis := redis.NewRedisClient()
+	userHdl := handler.NewUserHandler(redis)
 	router.POST("/login", userHdl.Login())
 	router.GET("/ping", userHdl.Ping())
 	router.GET("/get-counter", userHdl.GetCounter())

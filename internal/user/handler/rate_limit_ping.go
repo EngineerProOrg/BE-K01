@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/EngineerProOrg/BE-K01/tools/redis"
 	"github.com/EngineerProOrg/BE-K01/internal/user/model"
 	"time"
 )
@@ -16,18 +15,18 @@ func (hdl *userHandler) RateLimitPing() gin.HandlerFunc {
 			ctx.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		redisClient := redis.NewRedisClient()
-		exists, _ := redisClient.Exists(ctx, nameUser.Username).Result()
+
+		exists, _ := hdl.redis.Exists(ctx, nameUser.Username).Result()
 		if exists == 0 {
-			redisClient.Set(ctx, nameUser.Username, 0, time.Duration(60*time.Second))
+			hdl.redis.Set(ctx, nameUser.Username, 0, time.Duration(60*time.Second))
 		} else {
-			count := redisClient.Get(ctx, nameUser.Username).Val()
+			count := hdl.redis.Get(ctx, nameUser.Username).Val()
 			if count == "2" {
 				ctx.JSON(400, gin.H{"error": "limit 2 requests per 5s"})
 				return
 			}
 		}
-		redisClient.Incr(ctx, nameUser.Username) // serve as a counter for the number of requests of each user
+		hdl.redis.Incr(ctx, nameUser.Username) // serve as a counter for the number of requests of each user
 
 		ctx.JSON(200, gin.H{"message": "pong"})
 	}

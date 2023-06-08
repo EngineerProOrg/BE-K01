@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/EngineerProOrg/BE-K01/tools/redis"
 	"github.com/EngineerProOrg/BE-K01/internal/user/model"
 	"github.com/gin-gonic/gin"
 	"crypto/rand"
@@ -25,8 +24,7 @@ func (hdl *userHandler) Login() gin.HandlerFunc {
 			ctx.JSON(400, gin.H{"error": error.Error()})
 			return
 		}
-		redisClient := redis.NewRedisClient()
-		if err := redisClient.Set(ctx, sessionId, user.Username, time.Duration(10000000000000)).Err() ; err != nil {
+		if err := hdl.redis.Set(ctx, sessionId, user.Username, time.Duration(10000000000000)).Err() ; err != nil {
 			ctx.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
