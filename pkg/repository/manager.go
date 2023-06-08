@@ -13,13 +13,13 @@ type repo struct {
 	db *gorm.DB
 }
 
+func (r *repo) GetStudentByIdx(id int64) {
+	std := &types.Student{}
+	r.db.First(std, id)
+}
+
 func NewStudentRepository(db *gorm.DB) StudentRepository {
 	return &repo{
 		db: db,
 	}
-}
-
-func (r *repo) GetStudentByIdx(id int64) {
-	std := &types.Student{}
-	r.db.First(std, id)
 }
