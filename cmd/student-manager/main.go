@@ -26,6 +26,14 @@ const (
 	PingRateLimit        = 60
 	TopPingCount         = 10
 	MutexName            = "pingLock"
+
+	DbServerAddress  = "192.168.0.103:3306"
+	DbServerUser     = "quangmx"
+	DbServerPassword = "2511"
+	DbName           = "engineerpro"
+
+	RedisServerAddress  = "192.168.0.103:6379"
+	RedisServerPassword = "2511"
 )
 
 var (
@@ -45,7 +53,7 @@ func init() {
 func initDatabase() {
 	var err error
 	db, err = gorm.Open(mysql.New(mysql.Config{
-		DSN:                       "quangmx:2511@tcp(127.0.0.1:3306)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local",
+		DSN:                       fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbServerUser, DbServerPassword, DbServerAddress, DbName),
 		DefaultStringSize:         256,
 		DisableDatetimePrecision:  true,
 		DontSupportRenameIndex:    true,
@@ -61,7 +69,7 @@ func initDatabase() {
 
 // initRedis initializes the Redis instance
 func initRedis() {
-	redisClient = redis.NewClient(&redis.Options{})
+	redisClient = redis.NewClient(&redis.Options{Addr: RedisServerAddress, Password: RedisServerPassword})
 	if redisClient == nil {
 		fmt.Println("Can not initialize redis")
 		return
@@ -136,7 +144,7 @@ func handleLogin(c *gin.Context) {
 	}
 
 	// Set sessionID cookie
-	c.SetCookie("sessionID", sessionID, CookieExpirationTime, "/", "localhost", false, true)
+	c.SetCookie("sessionID", sessionID, CookieExpirationTime, "/", c.Request.Host, false, true)
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Log in successfully!", "sessionID": sessionID})
 }
