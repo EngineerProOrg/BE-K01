@@ -1,8 +1,9 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/EngineerProOrg/BE-K01/pkg/repository"
-	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
@@ -14,6 +15,16 @@ type StudentManagerService interface {
 type studentManagerService struct {
 	repo  repository.StudentRepository
 	redis *redis.Client
+	db    *gorm.DB
+}
+
+type StudentManager struct {
+	// Các trường dữ liệu khác của StudentManager (nếu có)
+}
+
+func (s *StudentManager) GetProfessor(id int64) interface{} {
+	fmt.Println("vo day")
+	return nil
 }
 
 func NewService(db *gorm.DB, redis *redis.Client) StudentManagerService {
@@ -21,10 +32,4 @@ func NewService(db *gorm.DB, redis *redis.Client) StudentManagerService {
 		repo:  repository.NewStudentRepository(db),
 		redis: redis,
 	}
-}
-
-func MappingService(r *gin.Engine, service StudentManagerService) {
-	r.GET("test", func(context *gin.Context) {
-		service.GetProfessor(1)
-	})
 }
