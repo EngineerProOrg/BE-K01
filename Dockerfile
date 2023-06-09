@@ -2,7 +2,7 @@
 FROM golang:latest
 
 # Sao chép mã nguồn vào thư mục /app trong container
-COPY . /app
+COPY Dockerfile docker-compose.yaml go.mod main.go /app/
 
 # Đặt thư mục làm việc mặc định trong container
 WORKDIR /app

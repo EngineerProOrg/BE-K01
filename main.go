@@ -2,20 +2,16 @@ package main
 
 import (
 	"log"
-	"strconv"
-	"sync"
 	"time"
 	"net/http"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	"github.com/golang/groupcache/lru"
+	"github.com/google/uuid"
 )
 
 var client *redis.Client
-var mutex = &sync.Mutex{} 
-var lruCache *lru.Cache
 var hllKey = "ping_callers"
 
 
@@ -24,9 +20,6 @@ func init() {
 	client = redis.NewClient(&redis.Options{
 		Addr:     "redis:6379",
 	})
-
-	// Initialize LRU cache with a maximum of 10 entries
-	lruCache = lru.New(10)
 }
 
 func main() {
@@ -48,29 +41,40 @@ func main() {
 }
 
 func loginHandler(c *gin.Context) {
+	sessionID := c.GetHeader("session_id")
+	if sessionID != "" {
+		// Session ID already exists, no need to create a new session
+		c.JSON(http.StatusOK, gin.H{"message": "Already logged in"})
+		return
+	}
+
 	username := c.PostForm("username")
-	sessionID := generateSessionID()
+	sessionID = generateSessionID()
 
 	// Store the session ID and user name in Redis
-	// err := client.HSet(client.Context(), "sessions", sessionID, username).Err()
 	err := client.Set(c, sessionID, username, 0).Err()
-	fmt.Println(err)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
 
-	// c.JSON(200, gin.H{"username": username, "session_id": sessionID})
-	c.JSON(http.StatusOK, gin.H{"session_id": sessionID})
+	// Set sessionID cookie
+	c.SetCookie("session_id", sessionID, 300, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, gin.H{"session_id": sessionID, "username": username, "message": "Session created successfully"})
 }
 
 func pingHandler(c *gin.Context) {
-	sessionID := c.Query("session_id")
+	sessionID, err := c.Cookie("session_id")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "session ID not found"})
+		return
+	}
 
 	// Check if the session ID is valid
 	userName, err := client.Get(c, sessionID).Result()
-	if err == redis.Nil {
+	if err == nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid session ID"})
 		return
 	} else if err != nil {
@@ -78,26 +82,30 @@ func pingHandler(c *gin.Context) {
 		return
 	}
 
-	// Acquire lock to ensure only one person can call /ping at a time
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	// Check if the user has exceeded the rate limit
-	callCountKey := fmt.Sprintf("call_count:%s", userName)
-	callCount, _ := lruCache.Get(callCountKey)
-	if callCount == nil {
-		callCount = 1
-	} else {
-		count, _ := strconv.Atoi(callCount.(string))
-		if count >= 2 {
-			c.JSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
-			return
-		}
-		callCount = count + 1
+	// Acquire distributed lock to ensure only one person can call /ping at a time
+	lockKey := fmt.Sprintf("lock:%s", userName)
+	ok, err := client.SetNX(c, lockKey, "locked", 5*time.Second).Result()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to obtain lock"})
+		return
+	}
+	if !ok {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "failed to obtain lock"})
+		return
 	}
 
-	// Increment the call count
-	lruCache.Add(callCountKey, callCount)
+	// Implement Redis-based rate limiting
+	rateLimitKey := fmt.Sprintf("ratelimit:%s", userName)
+	remaining, err := client.Incr(c, rateLimitKey).Result()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to increment rate limit"})
+		return
+	}
+
+	if remaining > 2 {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
+		return
+	}
 
 	// Sleep for 5 seconds to simulate processing time
 	time.Sleep(5 * time.Second)
@@ -133,6 +141,5 @@ func countHandler(c *gin.Context) {
 }
 
 func generateSessionID() string {
-	timestamp := time.Now().UnixNano()
-	return fmt.Sprintf("session:%d", timestamp)
+	return uuid.New().String()
 }
