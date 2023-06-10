@@ -1,0 +1,60 @@
+version: '3'
+services:
+  web:
+    build: ./build/web/
+    image: websvc
+    ports:
+      - 8080
+    depends_on:
+      - newsfeed
+      - aap
+    networks:
+      - intranet
+      - default
+    hostname: web
+
+  aap:
+    build: ./build/aap/
+    image: aapsvc
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - intranet
+    hostname: aap
+  newsfeed:
+    build: ./build/newsfeed/
+    image: newsfeedsvc
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - intranet
+    hostname: newsfeed
+  mysql:
+    image: mysql:5.5
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: 123456
+    ports:
+      - 3306:3306
+    networks:
+      - intranet
+    ulimits:
+      nofile:
+        soft: "65536"
+        hard: "65536"
+    hostname: mysql
+  redis:
+    image: redis:latest
+    networks:
+      - intranet
+    ports:
+      - 6379:6379
+    hostname: redis
+networks:
+  intranet: {}
+  default: {}

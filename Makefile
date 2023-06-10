@@ -20,3 +20,4 @@ tidy:
 .PHONY: vendor
 vendor:
 	go mod vendor -v
+aap_svc:
