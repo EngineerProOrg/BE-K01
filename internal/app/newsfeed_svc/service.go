@@ -3,6 +3,7 @@ package newsfeed_svc
 import (
 	"context"
 
+	"github.com/EngineerProOrg/BE-K01/configs"
 	"github.com/EngineerProOrg/BE-K01/pkg/types/proto/pb/newsfeed"
 )
 
@@ -15,6 +16,6 @@ func (n NewsfeedService) Newsfeed(ctx context.Context, request *newsfeed.Newsfee
 	panic("implement me")
 }
 
-func NewNewsfeedService() *NewsfeedService {
+func NewNewsfeedService(config *configs.NewsfeedConfig) *NewsfeedService {
 	return &NewsfeedService{}
 }

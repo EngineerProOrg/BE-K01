@@ -1,22 +1,32 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
 
+	"github.com/EngineerProOrg/BE-K01/configs"
 	"github.com/EngineerProOrg/BE-K01/internal/app/authen_and_post_svc"
 	"github.com/EngineerProOrg/BE-K01/pkg/types/proto/pb/authen_and_post"
 	"google.golang.org/grpc"
 )
 
+var (
+	path = flag.String("conf", "config.yml", "config path for this service")
+)
+
 func main() {
 	// Start authenticate and post service
+	conf, err := configs.GetAuthenticateAndPostConfig(*path)
+	if err != nil {
+		log.Fatalf("failed to parse config: %v", err)
+	}
+	service := authen_and_post_svc.NewAuthenticateAndPostService(conf)
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", "1080"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	service := authen_and_post_svc.NewAuthenticateAndPostService()
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	authen_and_post.RegisterAuthenticateAndPostServer(grpcServer, service)

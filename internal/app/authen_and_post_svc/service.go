@@ -3,6 +3,7 @@ package authen_and_post_svc
 import (
 	"context"
 
+	"github.com/EngineerProOrg/BE-K01/configs"
 	"github.com/EngineerProOrg/BE-K01/pkg/types/proto/pb/authen_and_post"
 )
 
@@ -35,6 +36,6 @@ type AuthenticateAndPostService struct {
 	authen_and_post.UnimplementedAuthenticateAndPostServer
 }
 
-func NewAuthenticateAndPostService() *AuthenticateAndPostService {
+func NewAuthenticateAndPostService(conf *configs.AuthenticateAndPostConfig) *AuthenticateAndPostService {
 	return &AuthenticateAndPostService{}
 }
