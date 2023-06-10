@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = ".;newsfeed";
+package newsfeed;
+
+service Newsfeed {
+  rpc Newsfeed(NewsfeedRequest) returns (NewsfeedResponse) {}
+}
+
+message NewsfeedRequest {
+  int64 user_id = 1;
+}
+
+message NewsfeedResponse {
+  repeated int64 post_ids = 1;
+}

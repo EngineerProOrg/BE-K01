@@ -1,0 +1,48 @@
+syntax = "proto3";
+option go_package = ".;authen_and_post";
+package authen_and_post;
+
+service AuthenticateAndPost {
+  rpc CheckUserAuthentication(UserInfo) returns (UserResult) {}
+  rpc CreateUser(UserDetailInfo) returns (UserResult) {}
+  rpc EditUser(UserDetailInfo) returns (UserResult) {}
+  rpc GetUserFollower(UserInfo) returns (UserFollower) {}
+  rpc GetPostDetail(GetPostRequest) returns (Post) {}
+  //TODO: create more api
+}
+message UserInfo {
+  int64 user_id = 1;
+  string user_name = 2;
+  string user_password = 3;
+}
+
+message UserDetailInfo {
+  int64 user_id = 1;
+  string user_name = 2;
+  string first_name = 3;
+  string last_name = 4;
+  int64 dob = 5;
+  string email = 6;
+}
+
+message UserResult {
+  uint32 status = 1;
+  UserDetailInfo info = 2;
+}
+
+message UserFollower {
+  repeated UserInfo followers = 1;
+}
+
+message GetPostRequest {
+  int64 post_id = 1;
+}
+
+message Post {
+  int64 post_id = 1;
+  int64 user_id = 2;
+  string content_text = 3;
+  string content_image_path = 4;
+  bool visible = 5;
+  int64 created_at = 6;
+}
