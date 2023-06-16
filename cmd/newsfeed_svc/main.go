@@ -23,8 +23,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to parse config: %v", err)
 	}
-	service := newsfeed_svc.NewNewsfeedService(conf)
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", "1080"))
+	service, err := newsfeed_svc.NewNewsfeedService(conf)
+	if err != nil {
+		log.Fatalf("failed to init service %s", err)
+	}
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", conf.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

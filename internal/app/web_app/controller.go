@@ -17,5 +17,6 @@ func (c WebController) Run() {
 	r := gin.Default()
 	v1Router := r.Group("v1")
 	v1.AddUserRouter(v1Router, &c.WebService)
+
 	r.Run(fmt.Sprintf(":%d", c.Port))
 }

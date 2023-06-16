@@ -11,11 +11,11 @@ import (
 )
 
 type allInOneConfig struct {
-	MySQL                     mysql.Config
-	Redis                     redis.Options
-	AuthenticateAndPostConfig *AuthenticateAndPostConfig
-	NewsfeedConfig            *NewsfeedConfig
-	WebConfig                 *WebConfig
+	MySQL                     mysql.Config               `yaml:"my_sql"`
+	Redis                     redis.Options              `yaml:"redis"`
+	AuthenticateAndPostConfig *AuthenticateAndPostConfig `yaml:"authenticate_and_post_config"`
+	NewsfeedConfig            *NewsfeedConfig            `yaml:"newsfeed_config"`
+	WebConfig                 *WebConfig                 `yaml:"web_config"`
 }
 
 func getAllInOneConfig(path string) (*allInOneConfig, error) {

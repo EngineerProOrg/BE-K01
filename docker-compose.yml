@@ -1,0 +1,83 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: cmd/web_app/Dockerfile
+      target: test_env
+    image: websvc
+    ports:
+      - 19003:19003
+    depends_on:
+      - newsfeed
+      - aap
+    networks:
+      - intranet
+      - default
+    hostname: web
+
+  aap:
+    build:
+      context: .
+      dockerfile: cmd/authen_and_post_svc/Dockerfile
+      target: test_env
+    image: aapsvc
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - intranet
+    hostname: aap
+    ports:
+      - 19001:19001
+  newsfeed:
+    build:
+      context: .
+      dockerfile: cmd/newsfeed_svc/Dockerfile
+      target: test_env
+    image: newsfeedsvc
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - intranet
+    hostname: newsfeed
+    ports:
+      - 19002:19002
+  mysql:
+    image: mysql:5.5
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: engineerpro
+    ports:
+      - 3306:3306
+    networks:
+      - intranet
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    hostname: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+  redis:
+    image: redis:latest
+    networks:
+      - intranet
+    ports:
+      - 6379:6379
+    hostname: redis
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+networks:
+  intranet: {}
+  default: {}

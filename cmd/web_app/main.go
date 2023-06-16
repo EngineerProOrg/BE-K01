@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/EngineerProOrg/BE-K01/configs"
@@ -10,11 +11,13 @@ import (
 )
 
 var (
-	path = flag.String("conf", "config.yml", "config path for this service")
+	path = flag.String("config", "config.yml", "config path for this service")
 )
 
 func main() {
+	flag.Parse()
 	conf, err := configs.GetWebConfig(*path)
+	fmt.Println(conf)
 	if err != nil {
 		log.Fatalf("failed to parse config: %v", err)
 	}
@@ -24,5 +27,6 @@ func main() {
 	}
 	web_app.WebController{
 		WebService: *webSvc,
+		Port:       conf.Port,
 	}.Run()
 }

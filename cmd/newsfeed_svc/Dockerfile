@@ -1,13 +1,21 @@
-FROM golang:1.14
+FROM golang:1.19.8 AS builder
 
 ENV GO111MODULE=on
-
 WORKDIR /app
 
 RUN mkdir /var/log/entry/
-RUN go mod download
 COPY ../../ .
+RUN --mount=type=cache,target=/go/pkg/mod/cache go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build cmd/newsfeed_svc/main.go
+RUN --mount=type=cache,target=/go/pkg/mod/cache CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o newsfeed_svc.linux -mod=mod cmd/newsfeed_svc/main.go
 
-CMD ["/app/main -config config/files/test.yml"]
+CMD ["/app/newsfeed_svc.linux"]
+
+FROM builder AS test_env
+
+RUN cp /app/configs/files/test.yml /app/config.yml
+CMD ["/app/newsfeed_svc.linux"]
+
+FROM builder AS live_env
+RUN cp /app/configs/files/live.yml /app/config.yml
+CMD ["/app/newsfeed_svc.linux"]

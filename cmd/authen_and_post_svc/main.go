@@ -22,8 +22,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to parse config: %v", err)
 	}
-	service := authen_and_post_svc.NewAuthenticateAndPostService(conf)
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", "1080"))
+	service, err := authen_and_post_svc.NewAuthenticateAndPostService(conf)
+	if err != nil {
+		log.Fatalf("failed to init server %s", err)
+	}
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", conf.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

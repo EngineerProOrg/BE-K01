@@ -20,4 +20,9 @@ tidy:
 .PHONY: vendor
 vendor:
 	go mod vendor -v
-aap_svc:
+docker_clear:
+	docker volume rm $(docker volume ls -qf dangling=true) & docker rmi $(docker images -f "dangling=true" -q)
+compose_up_rebuild:
+	docker compose up --build --force-recreate
+compose_up:
+	docker compose up

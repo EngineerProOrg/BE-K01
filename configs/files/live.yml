@@ -1,19 +1,22 @@
-MySQL: &MYSQL
-  DSN: "root:123456@tcp(mysql:3306)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local"
-  DefaultStringSize: 256
-  DisableDatetimePrecision: true
-  DontSupportRenameIndex: true
-  SkipInitializeWithVersion: false
-Redis: &REDIS
-  Addr: redis:6379
-AuthenticateAndPostConfig:
-  MySQL: *MYSQL
-  Redis: *REDIS
-NewsfeedConfig:
-  MySQL: *MYSQL
-  Redis: *REDIS
-WebConfig:
-  AuthenticateAndPost:
-    Hosts: ["aap:19001"]
-  Newsfeed:
-    Hosts: ["newsfeed:19002"]
+my_sql: &MYSQL
+  dsn: "root:123456@tcp(mysql:3306)/engineerpro?charset=utf8mb4&parseTime=True&loc=Local"
+  defaultstringsize: 256
+  disabledatetimeprecision: true
+  dontsupportrenameindex: true
+  skipinitializewithversion: false
+redis: &REDIS
+  addr: redis:6379
+authenticate_and_post_config:
+  port: 19001
+  my_sql: *MYSQL
+  redis: *REDIS
+newsfeed_config:
+  port: 19002
+  my_sql: *MYSQL
+  redis: *REDIS
+web_config:
+  port: 19003
+  authenticate_and_post:
+    hosts: ["aap:19001"]
+  newsfeed:
+    hosts: ["newsfeed:19002"]
