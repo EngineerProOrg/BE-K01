@@ -7,13 +7,7 @@ import (
 
 func AddUserRouter(r *gin.RouterGroup, svc *service.WebService) {
 	userRouter := r.Group("users")
-	userRouter.GET("", func(context *gin.Context) {
-		context.JSON(200, gin.H{"body": "ok"})
-	})
-	userRouter.POST("", func(context *gin.Context) {
-
-	})
-	userRouter.PUT("", func(context *gin.Context) {
-
-	})
+	userRouter.GET("", svc.CheckUserNamePassword)
+	userRouter.POST("", svc.CreateUser)
+	userRouter.PUT("", svc.EditUser)
 }
