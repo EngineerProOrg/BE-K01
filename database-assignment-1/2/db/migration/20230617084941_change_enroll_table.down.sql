@@ -1,0 +1,2 @@
+ALTER TABLE enroll
+MODIFY grade VARCHAR(3);

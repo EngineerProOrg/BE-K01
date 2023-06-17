@@ -1,0 +1,11 @@
+ALTER TABLE class
+DROP FOREIGN KEY fk_class_room;
+ALTER TABLE room
+DROP FOREIGN KEY fk_room_class;
+
+DROP TABLE IF EXISTS enroll;
+DROP TABLE IF EXISTS student;
+DROP table IF EXISTS class;
+DROP table IF EXISTS course;
+DROP TABLE IF EXISTS professor;
+DROP TABLE IF EXISTS room;
