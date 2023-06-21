@@ -7,7 +7,7 @@ import (
 
 func AddUserRouter(r *gin.RouterGroup, svc *service.WebService) {
 	userRouter := r.Group("users")
-	userRouter.GET("", svc.CheckUserNamePassword)
+	userRouter.POST("login", svc.CheckUserNamePassword)
 	userRouter.POST("", svc.CreateUser)
 	userRouter.PUT("", svc.EditUser)
 }

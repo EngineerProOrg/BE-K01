@@ -17,6 +17,7 @@ type User struct {
 	UserName       string    `gorm:"size:50;not null;index:idx_username"`
 	Following      []*User   `gorm:"many2many:following;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:friend_id"`
 	Follower       []*User   `gorm:"many2many:following;foreignKey:id;joinForeignKey:friend_id;References:id;joinReferences:user_id"`
+	Posts          []*Post   `gorm:"foreignKey:UserID"`
 }
 
 func (User) TableName() string {
@@ -30,6 +31,7 @@ type Post struct {
 	UserID           uint       `gorm:"not null"`
 	Visible          bool       `gorm:"not null"`
 	Comments         []*Comment `gorm:"foreignKey:PostID"`
+	LikedUsers       []*User    `gorm:"many2many:like;foreignKey:id;joinForeignKey:post_id;References:id;joinReferences:user_id"`
 }
 
 func (Post) TableName() string {

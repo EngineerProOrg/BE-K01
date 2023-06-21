@@ -1,0 +1,73 @@
+basePath: /api/v1
+definitions:
+  types.LoginRequest:
+    properties:
+      password:
+        type: string
+      user_name:
+        type: string
+    type: object
+  types.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+info:
+  contact:
+    email: tpdongcs@gmail.com
+    name: Dong Truong
+    url: https://www.linkedin.com/in/dong-truong-56297a145/
+  description: A simple social network management service API in Go using Gin framework.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Gin Social network Service
+  version: "1.0"
+paths:
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: check user user_name and password
+      parameters:
+      - description: login param
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+      summary: get user
+      tags:
+      - test
+securityDefinitions:
+  OAuth2AccessCode:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: accessCode
+    scopes:
+      admin: "\t\t\t\t\t\t\tGrants read and write access to administrative information"
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Password:
+    flow: password
+    scopes:
+      admin: "\t\t\t\t\t\t\tGrants read and write access to administrative information"
+      read: "\t\t\t\t\t\t\t\tGrants read access"
+      write: "\t\t\t\t\t\t\tGrants write access"
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+swagger: "2.0"

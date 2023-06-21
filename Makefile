@@ -26,3 +26,5 @@ compose_up_rebuild:
 	docker compose up --build --force-recreate
 compose_up:
 	docker compose up
+gen_swagger:
+	swag init -g cmd/web_app/main.go

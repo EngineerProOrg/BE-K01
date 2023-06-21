@@ -33,11 +33,23 @@ func NewWebService(conf *configs.WebConfig) (*WebService, error) {
 	}, nil
 }
 
+// CheckUserNamePassword godoc
+//
+//	@Summary		get user
+//	@Description	check user user_name and password
+//	@Tags			test
+//	@Accept			json
+//	@Produce		json
+//	@Param			request body types.LoginRequest true "login param"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/users/login [post]
 func (svc *WebService) CheckUserNamePassword(ctx *gin.Context) {
 	var jsonRequest types.LoginRequest
-	err := ctx.ShouldBindJSON(jsonRequest)
+	err := ctx.ShouldBindJSON(&jsonRequest)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, &types.MessageResponse{Message: err.Error()})
 		return
 	}
 	authentication, err := svc.authenticateAndPostClient.CheckUserAuthentication(ctx, &authen_and_post.UserInfo{
@@ -45,11 +57,11 @@ func (svc *WebService) CheckUserNamePassword(ctx *gin.Context) {
 		UserPassword: jsonRequest.Password,
 	})
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, &types.MessageResponse{Message: err.Error()})
 		return
 	}
 	if authentication.GetStatus() == authen_and_post.UserStatus_OK {
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, &types.MessageResponse{Message: "ok"})
 		// change this later
 		ctx.SetCookie("session_id", fmt.Sprintf("%d", authentication.Info.UserId), 0, "", "", false, false)
 	}
