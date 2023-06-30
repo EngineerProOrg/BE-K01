@@ -17,8 +17,13 @@ func (a *AuthenticateAndPostService) CheckUserAuthentication(ctx context.Context
 }
 
 func (a *AuthenticateAndPostService) CreateUser(ctx context.Context, info *authen_and_post.UserDetailInfo) (*authen_and_post.UserResult, error) {
-	//TODO implement me
-	panic("implement me")
+	return &authen_and_post.UserResult{
+		Status: authen_and_post.UserStatus_OK,
+		Info: &authen_and_post.UserDetailInfo{
+			UserId:   1,
+			UserName: "dong.truong",
+		},
+	}, nil
 }
 
 func (a *AuthenticateAndPostService) EditUser(ctx context.Context, info *authen_and_post.UserDetailInfo) (*authen_and_post.UserResult, error) {

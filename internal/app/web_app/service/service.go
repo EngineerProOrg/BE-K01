@@ -3,6 +3,8 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/EngineerProOrg/BE-K01/configs"
 	"github.com/EngineerProOrg/BE-K01/internal/pkg/types"
@@ -46,10 +48,18 @@ func NewWebService(conf *configs.WebConfig) (*WebService, error) {
 //	@Failure		500	{object} types.MessageResponse
 //	@Router			/users/login [post]
 func (svc *WebService) CheckUserNamePassword(ctx *gin.Context) {
+	start := time.Now()
+	status := http.StatusOK
+	countExporter.WithLabelValues("check_user_login", "total").Inc()
+	defer func() {
+		latencyExporter.WithLabelValues("check_user_login", strconv.Itoa(status)).Observe(float64(start.UnixMilli()))
+	}()
 	var jsonRequest types.LoginRequest
 	err := ctx.ShouldBindJSON(&jsonRequest)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, &types.MessageResponse{Message: err.Error()})
+		countExporter.WithLabelValues("check_user_login", "bad_request").Inc()
+		status = http.StatusBadRequest
+		ctx.JSON(status, &types.MessageResponse{Message: err.Error()})
 		return
 	}
 	authentication, err := svc.authenticateAndPostClient.CheckUserAuthentication(ctx, &authen_and_post.UserInfo{
@@ -57,11 +67,14 @@ func (svc *WebService) CheckUserNamePassword(ctx *gin.Context) {
 		UserPassword: jsonRequest.Password,
 	})
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, &types.MessageResponse{Message: err.Error()})
+		countExporter.WithLabelValues("check_user_login", "call_api_failed").Inc()
+		status = http.StatusInternalServerError
+		ctx.JSON(status, &types.MessageResponse{Message: err.Error()})
 		return
 	}
 	if authentication.GetStatus() == authen_and_post.UserStatus_OK {
-		ctx.JSON(http.StatusOK, &types.MessageResponse{Message: "ok"})
+		countExporter.WithLabelValues("check_user_login", "success").Inc()
+		ctx.JSON(status, &types.MessageResponse{Message: "ok"})
 		// change this later
 		ctx.SetCookie("session_id", fmt.Sprintf("%d", authentication.Info.UserId), 0, "", "", false, false)
 	}

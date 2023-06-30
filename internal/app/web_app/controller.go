@@ -7,6 +7,7 @@ import (
 	"github.com/EngineerProOrg/BE-K01/internal/app/web_app/service"
 	v1 "github.com/EngineerProOrg/BE-K01/internal/app/web_app/v1"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -23,6 +24,7 @@ func (c WebController) Run() {
 	v1.AddUserRouter(v1Router, &c.WebService)
 	initSwagger(r)
 	initPprof(r)
+	initPrometheus(r)
 	r.Run(fmt.Sprintf(":%d", c.Port))
 }
 
@@ -39,5 +41,11 @@ func initPprof(r *gin.Engine) {
 	})
 	r.GET("/debug/pprof/trace", func(context *gin.Context) {
 		pprof.Trace(context.Writer, context.Request)
+	})
+}
+func initPrometheus(r *gin.Engine) {
+	handler := promhttp.Handler()
+	r.GET("/metrics", func(context *gin.Context) {
+		handler.ServeHTTP(context.Writer, context.Request)
 	})
 }
