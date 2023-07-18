@@ -23,6 +23,8 @@ func (c WebController) Run() {
 	v1Router := r.Group("/api/v1")
 	v1.AddUserRouter(v1Router, &c.WebService)
 	v1.AddFriendRouter(v1Router, &c.WebService)
+	v1.AddPostRouter(v1Router, &c.WebService)
+	v1.AddNewsfeedRouter(v1Router, &c.WebService)
 	initSwagger(r)
 	initPprof(r)
 	initPrometheus(r)
