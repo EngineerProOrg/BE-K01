@@ -4,7 +4,7 @@ USE engineerpro;
 -- Create the user table
 CREATE TABLE user (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  hashed_password VARCHAR(50) NOT NULL,
+  hashed_password VARCHAR(256) NOT NULL,
   salt VARCHAR(20) NOT NULL,
   first_name VARCHAR(50) NOT NULL,
   last_name VARCHAR(50) NOT NULL,

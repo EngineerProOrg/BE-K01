@@ -24,36 +24,6 @@ info:
   title: Gin Social network Service
   version: "1.0"
 paths:
-  /friends/:user_id:
-    post:
-      consumes:
-      - application/json
-      description: get list of user's follow
-      parameters:
-      - description: login param
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.LoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.MessageResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.MessageResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/types.MessageResponse'
-      summary: get list of user's follow
-      tags:
-      - friends
   /users/login:
     post:
       consumes:

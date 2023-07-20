@@ -1,11 +1,13 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
 option go_package = ".;authen_and_post";
 package authen_and_post;
 
 service AuthenticateAndPost {
-  rpc CheckUserAuthentication(UserInfo) returns (UserResult) {}
+  rpc CheckUserAuthentication(CheckUserAuthenticationRequest) returns (CheckUserAuthenticationResponse) {}
   rpc CreateUser(UserDetailInfo) returns (UserResult) {}
-  rpc EditUser(UserDetailInfo) returns (UserResult) {}
+  rpc EditUser(EditUserRequest) returns (EditUserResponse) {}
   rpc GetUserFollower(UserInfo) returns (UserFollower) {}
   rpc GetPostDetail(GetPostRequest) returns (Post) {}
   //TODO: create more api
@@ -19,10 +21,38 @@ message UserInfo {
 message UserDetailInfo {
   int64 user_id = 1;
   string user_name = 2;
-  string first_name = 3;
-  string last_name = 4;
-  int64 dob = 5;
-  string email = 6;
+  string user_password = 3;
+  string first_name = 4;
+  string last_name = 5;
+  google.protobuf.Timestamp dob = 6;
+  string email = 7;
+}
+
+message EditUserRequest {
+  int64 user_id = 1;
+  optional string user_password = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional google.protobuf.Timestamp dob = 6;
+}
+
+message EditUserResponse {
+  int64 user_id = 1;
+}
+
+message CheckUserAuthenticationRequest {
+  string user_name = 1;
+  string user_password = 2;
+}
+
+message CheckUserAuthenticationResponse {
+  enum AuthenticationStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+    WRONG_PASSWORD = 2;
+  }
+  AuthenticationStatus status = 1;
+  int64 user_id = 2;
 }
 
 enum UserStatus{

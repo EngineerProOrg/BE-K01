@@ -13,7 +13,7 @@ type randomClient struct {
 	clients []authen_and_post.AuthenticateAndPostClient
 }
 
-func (a *randomClient) CheckUserAuthentication(ctx context.Context, in *authen_and_post.UserInfo, opts ...grpc.CallOption) (*authen_and_post.UserResult, error) {
+func (a *randomClient) CheckUserAuthentication(ctx context.Context, in *authen_and_post.CheckUserAuthenticationRequest, opts ...grpc.CallOption) (*authen_and_post.CheckUserAuthenticationResponse, error) {
 	return a.clients[rand.Intn(len(a.clients))].CheckUserAuthentication(ctx, in, opts...)
 }
 
@@ -21,7 +21,7 @@ func (a *randomClient) CreateUser(ctx context.Context, in *authen_and_post.UserD
 	return a.clients[rand.Intn(len(a.clients))].CreateUser(ctx, in, opts...)
 }
 
-func (a *randomClient) EditUser(ctx context.Context, in *authen_and_post.UserDetailInfo, opts ...grpc.CallOption) (*authen_and_post.UserResult, error) {
+func (a *randomClient) EditUser(ctx context.Context, in *authen_and_post.EditUserRequest, opts ...grpc.CallOption) (*authen_and_post.EditUserResponse, error) {
 	return a.clients[rand.Intn(len(a.clients))].EditUser(ctx, in, opts...)
 }
 
