@@ -1,5 +1,33 @@
 basePath: /api/v1
 definitions:
+  types.CreateUserRequest:
+    properties:
+      dob:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      user_name:
+        type: string
+    type: object
+  types.EditUserRequest:
+    properties:
+      dob:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      user_id:
+        type: integer
+    type: object
   types.LoginRequest:
     properties:
       password:
@@ -24,6 +52,65 @@ info:
   title: Gin Social network Service
   version: "1.0"
 paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: create new user using user provided information
+      parameters:
+      - description: create user param
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+      summary: create user
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: edit user using user provided information
+      parameters:
+      - description: edit user param
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.EditUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+      summary: edit user
+      tags:
+      - User
   /users/login:
     post:
       consumes:
@@ -53,7 +140,7 @@ paths:
             $ref: '#/definitions/types.MessageResponse'
       summary: get user
       tags:
-      - test
+      - User
 securityDefinitions:
   OAuth2AccessCode:
     authorizationUrl: https://example.com/oauth/authorize

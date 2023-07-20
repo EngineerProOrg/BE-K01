@@ -14,9 +14,9 @@ import (
 
 // CheckUserNamePassword godoc
 //
-//	@Summary		get user
+//	@Summary		check user authentication
 //	@Description	check user user_name and password
-//	@Tags			test
+//	@Tags			User
 //	@Accept			json
 //	@Produce		json
 //	@Param			request body types.LoginRequest true "login param"
@@ -63,6 +63,18 @@ func (svc *WebService) CheckUserNamePassword(ctx *gin.Context) {
 	}
 }
 
+// CreateUser godoc
+//
+//	@Summary		create user
+//	@Description	create new user using user provided information
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			request body types.CreateUserRequest true "create user param"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/users [post]
 func (svc *WebService) CreateUser(ctx *gin.Context) {
 	var jsonRequest types.CreateUserRequest
 	err := ctx.ShouldBindJSON(&jsonRequest)
@@ -90,6 +102,18 @@ func (svc *WebService) CreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &types.MessageResponse{Message: fmt.Sprintf("Successfully created user with id: %d", createdUser.Info.UserId)})
 }
 
+// EditUser godoc
+//
+//	@Summary		edit user
+//	@Description	edit user using user provided information
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			request body types.EditUserRequest true "edit user param"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/users [put]
 func (svc *WebService) EditUser(ctx *gin.Context) {
 	var jsonRequest types.EditUserRequest
 	err := ctx.ShouldBindJSON(&jsonRequest)
