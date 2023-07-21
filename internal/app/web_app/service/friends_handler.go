@@ -11,6 +11,18 @@ import (
 	"go.uber.org/zap"
 )
 
+// GetFollowList godoc
+//
+//	@Summary		get list of user's follower
+//	@Description	get list of user's follower by user id
+//	@Tags			Follow
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id path int true "user id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/friends/{user_id} [get]
 func (svc *WebService) GetFollowList(ctx *gin.Context) {
 	userId, err := strconv.ParseInt(ctx.Param("user_id"), 10, 64)
 	if err != nil {
@@ -32,6 +44,18 @@ func (svc *WebService) GetFollowList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+// FollowUser godoc
+//
+//	@Summary		follow user
+//	@Description	follow user by user id with current user getting from session id
+//	@Tags			Follow
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id path int true "user id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/friends/{user_id} [post]
 func (svc *WebService) FollowUser(ctx *gin.Context) {
 	userId, err := strconv.ParseInt(ctx.Param("user_id"), 10, 64)
 	if err != nil {
@@ -72,6 +96,18 @@ func (svc *WebService) FollowUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, types.MessageResponse{Message: "follow user successfully"})
 }
 
+// UnfollowUser godoc
+//
+//	@Summary		unfollow user
+//	@Description	unfollow user by user id with current user getting from session id
+//	@Tags			Follow
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id path int true "user id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/friends/{user_id} [delete]
 func (svc *WebService) UnfollowUser(ctx *gin.Context) {
 	userId, err := strconv.ParseInt(ctx.Param("user_id"), 10, 64)
 	if err != nil {

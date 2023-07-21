@@ -52,6 +52,97 @@ info:
   title: Gin Social network Service
   version: "1.0"
 paths:
+  /friends/{user_id}:
+    delete:
+      consumes:
+      - application/json
+      description: unfollow user by user id with current user getting from session
+        id
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+      summary: unfollow user
+      tags:
+      - Follow
+    get:
+      consumes:
+      - application/json
+      description: get list of user's follower by user id
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+      summary: get list of user's follower
+      tags:
+      - Follow
+    post:
+      consumes:
+      - application/json
+      description: follow user by user id with current user getting from session id
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - default: token=xxx
+        description: token
+        in: header
+        name: Cookie
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.MessageResponse'
+      summary: follow user
+      tags:
+      - Follow
   /users:
     post:
       consumes:
@@ -138,7 +229,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/types.MessageResponse'
-      summary: get user
+      summary: check user authentication
       tags:
       - User
 securityDefinitions:
