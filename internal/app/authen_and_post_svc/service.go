@@ -2,6 +2,7 @@ package authen_and_post_svc
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -11,6 +12,7 @@ import (
 	"github.com/EngineerProOrg/BE-K01/internal/pkg/types"
 	"github.com/EngineerProOrg/BE-K01/pkg/types/proto/pb/authen_and_post"
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -18,7 +20,7 @@ import (
 
 func (a *AuthenticateAndPostService) CheckUserAuthentication(ctx context.Context, info *authen_and_post.CheckUserAuthenticationRequest) (*authen_and_post.CheckUserAuthenticationResponse, error) {
 	var user types.User
-	result := a.db.Where("user_name = ?", info.GetUserName()).First(&user)
+	result := a.db.Where(&types.User{UserName: info.GetUserName()}).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return &authen_and_post.CheckUserAuthenticationResponse{
 			Status: authen_and_post.CheckUserAuthenticationResponse_NOT_FOUND,
@@ -138,6 +140,8 @@ type AuthenticateAndPostService struct {
 	authen_and_post.UnimplementedAuthenticateAndPostServer
 	db    *gorm.DB
 	redis *redis.Client
+
+	log *zap.Logger
 }
 
 func NewAuthenticateAndPostService(conf *configs.AuthenticateAndPostConfig) (*AuthenticateAndPostService, error) {
@@ -152,8 +156,36 @@ func NewAuthenticateAndPostService(conf *configs.AuthenticateAndPostConfig) (*Au
 	if rd == nil {
 		return nil, fmt.Errorf("can not init redis client")
 	}
+
+	log, err := newLogger()
+	if err != nil {
+		return nil, err
+	}
 	return &AuthenticateAndPostService{
 		db:    db,
 		redis: rd,
+		log:   log,
 	}, nil
+}
+
+func newLogger() (*zap.Logger, error) {
+	rawJSON := []byte(`{
+	  "level": "debug",
+	  "encoding": "json",
+	  "outputPaths": ["stdout", "/tmp/logs"],
+	  "errorOutputPaths": ["stderr"],
+	  "initialFields": {"foo": "bar"},
+	  "encoderConfig": {
+	    "messageKey": "message",
+	    "levelKey": "level",
+	    "levelEncoder": "lowercase"
+	  }
+	}`)
+
+	var cfg zap.Config
+	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
+		return nil, err
+	}
+	logger := zap.Must(cfg.Build())
+	return logger, nil
 }

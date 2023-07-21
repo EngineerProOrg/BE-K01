@@ -24,3 +24,9 @@ type EditUserRequest struct {
 	Dob       string `json:"dob"`
 	Password  string `json:"password"`
 }
+
+// FollowUserRequest FollowUser request body
+type FollowUserRequest struct {
+	UserId      int64 `json:"user_id"`
+	FollowingId int64 `json:"following_id"`
+}

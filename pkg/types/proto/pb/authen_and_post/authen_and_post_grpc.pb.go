@@ -27,6 +27,9 @@ type AuthenticateAndPostClient interface {
 	EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*EditUserResponse, error)
 	GetUserFollower(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*UserFollower, error)
 	GetPostDetail(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*Post, error)
+	FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*FollowUserResponse, error)
+	UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*UnfollowUserResponse, error)
+	GetFollowerList(ctx context.Context, in *GetFollowerListRequest, opts ...grpc.CallOption) (*GetFollowerListResponse, error)
 }
 
 type authenticateAndPostClient struct {
@@ -82,6 +85,33 @@ func (c *authenticateAndPostClient) GetPostDetail(ctx context.Context, in *GetPo
 	return out, nil
 }
 
+func (c *authenticateAndPostClient) FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*FollowUserResponse, error) {
+	out := new(FollowUserResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/FollowUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*UnfollowUserResponse, error) {
+	out := new(UnfollowUserResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/UnfollowUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) GetFollowerList(ctx context.Context, in *GetFollowerListRequest, opts ...grpc.CallOption) (*GetFollowerListResponse, error) {
+	out := new(GetFollowerListResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/GetFollowerList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticateAndPostServer is the server API for AuthenticateAndPost service.
 // All implementations must embed UnimplementedAuthenticateAndPostServer
 // for forward compatibility
@@ -91,6 +121,9 @@ type AuthenticateAndPostServer interface {
 	EditUser(context.Context, *EditUserRequest) (*EditUserResponse, error)
 	GetUserFollower(context.Context, *UserInfo) (*UserFollower, error)
 	GetPostDetail(context.Context, *GetPostRequest) (*Post, error)
+	FollowUser(context.Context, *FollowUserRequest) (*FollowUserResponse, error)
+	UnfollowUser(context.Context, *UnfollowUserRequest) (*UnfollowUserResponse, error)
+	GetFollowerList(context.Context, *GetFollowerListRequest) (*GetFollowerListResponse, error)
 	mustEmbedUnimplementedAuthenticateAndPostServer()
 }
 
@@ -112,6 +145,15 @@ func (UnimplementedAuthenticateAndPostServer) GetUserFollower(context.Context, *
 }
 func (UnimplementedAuthenticateAndPostServer) GetPostDetail(context.Context, *GetPostRequest) (*Post, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPostDetail not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) FollowUser(context.Context, *FollowUserRequest) (*FollowUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FollowUser not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) UnfollowUser(context.Context, *UnfollowUserRequest) (*UnfollowUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnfollowUser not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) GetFollowerList(context.Context, *GetFollowerListRequest) (*GetFollowerListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowerList not implemented")
 }
 func (UnimplementedAuthenticateAndPostServer) mustEmbedUnimplementedAuthenticateAndPostServer() {}
 
@@ -216,6 +258,60 @@ func _AuthenticateAndPost_GetPostDetail_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthenticateAndPost_FollowUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FollowUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).FollowUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/FollowUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).FollowUser(ctx, req.(*FollowUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_UnfollowUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnfollowUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).UnfollowUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/UnfollowUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).UnfollowUser(ctx, req.(*UnfollowUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_GetFollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFollowerListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).GetFollowerList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/GetFollowerList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).GetFollowerList(ctx, req.(*GetFollowerListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthenticateAndPost_ServiceDesc is the grpc.ServiceDesc for AuthenticateAndPost service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +338,18 @@ var AuthenticateAndPost_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPostDetail",
 			Handler:    _AuthenticateAndPost_GetPostDetail_Handler,
+		},
+		{
+			MethodName: "FollowUser",
+			Handler:    _AuthenticateAndPost_FollowUser_Handler,
+		},
+		{
+			MethodName: "UnfollowUser",
+			Handler:    _AuthenticateAndPost_UnfollowUser_Handler,
+		},
+		{
+			MethodName: "GetFollowerList",
+			Handler:    _AuthenticateAndPost_GetFollowerList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -33,6 +33,18 @@ func (a *randomClient) GetPostDetail(ctx context.Context, in *authen_and_post.Ge
 	return a.clients[rand.Intn(len(a.clients))].GetPostDetail(ctx, in, opts...)
 }
 
+func (a *randomClient) FollowUser(ctx context.Context, in *authen_and_post.FollowUserRequest, opts ...grpc.CallOption) (*authen_and_post.FollowUserResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].FollowUser(ctx, in, opts...)
+}
+
+func (a *randomClient) UnfollowUser(ctx context.Context, in *authen_and_post.UnfollowUserRequest, opts ...grpc.CallOption) (*authen_and_post.UnfollowUserResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].UnfollowUser(ctx, in, opts...)
+}
+
+func (a *randomClient) GetFollowerList(ctx context.Context, in *authen_and_post.GetFollowerListRequest, opts ...grpc.CallOption) (*authen_and_post.GetFollowerListResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].GetFollowerList(ctx, in, opts...)
+}
+
 func NewClient(hosts []string) (authen_and_post.AuthenticateAndPostClient, error) {
 	var opts = []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	clients := make([]authen_and_post.AuthenticateAndPostClient, 0, len(hosts))

@@ -11,5 +11,4 @@ func AddFriendRouter(r *gin.RouterGroup, svc *service.WebService) {
 	friendRouter.GET(":user_id", svc.GetFollowList)
 	friendRouter.POST(":user_id", svc.FollowUser)
 	friendRouter.DELETE(":user_id", svc.UnfollowUser)
-	friendRouter.GET(":user_id/posts", svc.GetUserPosts)
 }

@@ -8,10 +8,61 @@ service AuthenticateAndPost {
   rpc CheckUserAuthentication(CheckUserAuthenticationRequest) returns (CheckUserAuthenticationResponse) {}
   rpc CreateUser(UserDetailInfo) returns (UserResult) {}
   rpc EditUser(EditUserRequest) returns (EditUserResponse) {}
+
   rpc GetUserFollower(UserInfo) returns (UserFollower) {}
   rpc GetPostDetail(GetPostRequest) returns (Post) {}
+
+  rpc FollowUser(FollowUserRequest) returns (FollowUserResponse) {}
+  rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse) {}
+  rpc GetFollowerList(GetFollowerListRequest) returns (GetFollowerListResponse) {}
   //TODO: create more api
 }
+
+message FollowUserRequest {
+  int64 user_id = 1;
+  int64 following_id = 2;
+}
+
+message FollowUserResponse {
+  enum FollowStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+    ALREADY_FOLLOWED = 2;
+  }
+  FollowStatus status = 1;
+}
+
+message UnfollowUserRequest {
+  int64 user_id = 1;
+  int64 following_id = 2;
+}
+
+message UnfollowUserResponse {
+  enum UnfollowStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+    NOT_FOLLOWED = 2;
+  }
+  UnfollowStatus status = 1;
+}
+
+message GetFollowerListRequest {
+  int64 user_id = 1;
+}
+
+message GetFollowerListResponse {
+  enum GetFollowerListStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+  }
+  GetFollowerListStatus status = 1;
+  message FollowerInfo {
+    int64 user_id = 1;
+    string user_name = 2;
+  }
+  repeated FollowerInfo followers = 2;
+}
+
 message UserInfo {
   int64 user_id = 1;
   string user_name = 2;
