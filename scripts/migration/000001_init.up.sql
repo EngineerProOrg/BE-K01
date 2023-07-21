@@ -53,9 +53,6 @@ CREATE TABLE comment (
 CREATE TABLE `like` (
     user_id INT NOT NULL,
     post_id INT NOT NULL,
-    created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL,
-    deleted_at TIMESTAMP NULL,
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (post_id) REFERENCES post(id),
     PRIMARY KEY (post_id, user_id)
