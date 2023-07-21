@@ -45,6 +45,30 @@ func (a *randomClient) GetFollowerList(ctx context.Context, in *authen_and_post.
 	return a.clients[rand.Intn(len(a.clients))].GetFollowerList(ctx, in, opts...)
 }
 
+func (a *randomClient) GetPost(ctx context.Context, in *authen_and_post.GetPostRequest, opts ...grpc.CallOption) (*authen_and_post.GetPostResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].GetPost(ctx, in, opts...)
+}
+
+func (a *randomClient) CreatePost(ctx context.Context, in *authen_and_post.CreatePostRequest, opts ...grpc.CallOption) (*authen_and_post.CreatePostResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].CreatePost(ctx, in, opts...)
+}
+
+func (a *randomClient) DeletePost(ctx context.Context, in *authen_and_post.DeletePostRequest, opts ...grpc.CallOption) (*authen_and_post.DeletePostResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].DeletePost(ctx, in, opts...)
+}
+
+func (a *randomClient) EditPost(ctx context.Context, in *authen_and_post.EditPostRequest, opts ...grpc.CallOption) (*authen_and_post.EditPostResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].EditPost(ctx, in, opts...)
+}
+
+func (a *randomClient) CreatePostComment(ctx context.Context, in *authen_and_post.CreatePostCommentRequest, opts ...grpc.CallOption) (*authen_and_post.CreatePostCommentResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].CreatePostComment(ctx, in, opts...)
+}
+
+func (a *randomClient) LikePost(ctx context.Context, in *authen_and_post.LikePostRequest, opts ...grpc.CallOption) (*authen_and_post.LikePostResponse, error) {
+	return a.clients[rand.Intn(len(a.clients))].LikePost(ctx, in, opts...)
+}
+
 func NewClient(hosts []string) (authen_and_post.AuthenticateAndPostClient, error) {
 	var opts = []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	clients := make([]authen_and_post.AuthenticateAndPostClient, 0, len(hosts))

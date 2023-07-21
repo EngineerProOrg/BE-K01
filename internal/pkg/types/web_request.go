@@ -25,8 +25,22 @@ type EditUserRequest struct {
 	Password  string `json:"password"`
 }
 
-// FollowUserRequest FollowUser request body
-type FollowUserRequest struct {
-	UserId      int64 `json:"user_id"`
-	FollowingId int64 `json:"following_id"`
+// CreatePostRequest CreatePost request body
+type CreatePostRequest struct {
+	UserId           int64  `json:"user_id"`
+	ContentText      string `json:"content_text"`
+	ContentImagePath string `json:"content_image_path"`
+	Visible          bool   `json:"visible"`
+}
+
+// EditPostRequest EditPost request body
+type EditPostRequest struct {
+	ContentText      *string `json:"content_text"`
+	ContentImagePath *string `json:"content_image_path"`
+	Visible          *bool   `json:"visible"`
+}
+
+// CreatePostCommentRequest CreatePostComment request body
+type CreatePostCommentRequest struct {
+	ContentText string `json:"content_text"`
 }

@@ -50,9 +50,9 @@ func (Comment) TableName() string {
 }
 
 type Like struct {
-	UserID    uint      `gorm:"primaryKey"`
-	PostID    uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"not null"`
+	gorm.Model
+	UserID uint `gorm:"primaryKey"`
+	PostID uint `gorm:"primaryKey"`
 }
 
 func (Like) TableName() string {

@@ -15,6 +15,14 @@ service AuthenticateAndPost {
   rpc FollowUser(FollowUserRequest) returns (FollowUserResponse) {}
   rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse) {}
   rpc GetFollowerList(GetFollowerListRequest) returns (GetFollowerListResponse) {}
+
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {}
+  rpc GetPost(GetPostRequest) returns (GetPostResponse) {}
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse) {}
+  rpc EditPost(EditPostRequest) returns (EditPostResponse) {}
+
+  rpc CreatePostComment(CreatePostCommentRequest) returns (CreatePostCommentResponse) {}
+  rpc LikePost(LikePostRequest) returns (LikePostResponse) {}
   //TODO: create more api
 }
 
@@ -125,10 +133,92 @@ message GetPostRequest {
 }
 
 message Post {
+  int64 post_id = 2;
+  int64 user_id = 3;
+  string content_text = 4;
+  string content_image_path = 5;
+  bool visible = 6;
+  google.protobuf.Timestamp created_time = 7;
+}
+
+message GetPostResponse {
+  enum GetPostStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+  }
+  GetPostStatus status = 1;
+  Post post = 2;
+}
+
+message CreatePostRequest {
+  int64 user_id = 1;
+  string content_text = 2;
+  string content_image_path = 3;
+  bool visible = 4;
+}
+
+message CreatePostResponse {
+  enum CreatePostStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+  }
+  CreatePostStatus status = 1;
+  int64 post_id = 2;
+}
+
+message DeletePostRequest {
+  int64 post_id = 1;
+}
+
+message DeletePostResponse {
+  enum DeletePostStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+  }
+  DeletePostStatus status = 1;
+}
+
+message EditPostRequest {
+  int64 post_id = 1;
+  optional string content_text = 2;
+  optional string content_image_path = 3;
+  optional bool visible = 4;
+}
+
+message EditPostResponse {
+  enum EditPostStatus {
+    OK = 0;
+    NOT_FOUND = 1;
+  }
+  EditPostStatus status = 1;
+}
+
+message CreatePostCommentRequest {
   int64 post_id = 1;
   int64 user_id = 2;
   string content_text = 3;
-  string content_image_path = 4;
-  bool visible = 5;
-  int64 created_at = 6;
+}
+
+message CreatePostCommentResponse {
+  enum CreatePostCommentStatus {
+    OK = 0;
+    USER_NOT_FOUND = 1;
+    POST_NOT_FOUND = 2;
+  }
+  CreatePostCommentStatus status = 1;
+  int64 comment_id = 2;
+}
+
+message LikePostRequest {
+  int64 user_id = 1;
+  int64 post_id = 2;
+}
+
+message LikePostResponse {
+  enum LikePostStatus {
+    OK = 0;
+    USER_NOT_FOUND = 1;
+    POST_NOT_FOUND = 2;
+  }
+  LikePostStatus status = 1;
 }

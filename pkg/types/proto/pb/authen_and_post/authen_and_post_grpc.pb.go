@@ -30,6 +30,12 @@ type AuthenticateAndPostClient interface {
 	FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*FollowUserResponse, error)
 	UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*UnfollowUserResponse, error)
 	GetFollowerList(ctx context.Context, in *GetFollowerListRequest, opts ...grpc.CallOption) (*GetFollowerListResponse, error)
+	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostResponse, error)
+	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
+	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error)
+	EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*EditPostResponse, error)
+	CreatePostComment(ctx context.Context, in *CreatePostCommentRequest, opts ...grpc.CallOption) (*CreatePostCommentResponse, error)
+	LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*LikePostResponse, error)
 }
 
 type authenticateAndPostClient struct {
@@ -112,6 +118,60 @@ func (c *authenticateAndPostClient) GetFollowerList(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *authenticateAndPostClient) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostResponse, error) {
+	out := new(CreatePostResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/CreatePost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error) {
+	out := new(GetPostResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/GetPost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error) {
+	out := new(DeletePostResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/DeletePost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*EditPostResponse, error) {
+	out := new(EditPostResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/EditPost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) CreatePostComment(ctx context.Context, in *CreatePostCommentRequest, opts ...grpc.CallOption) (*CreatePostCommentResponse, error) {
+	out := new(CreatePostCommentResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/CreatePostComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticateAndPostClient) LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*LikePostResponse, error) {
+	out := new(LikePostResponse)
+	err := c.cc.Invoke(ctx, "/authen_and_post.AuthenticateAndPost/LikePost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticateAndPostServer is the server API for AuthenticateAndPost service.
 // All implementations must embed UnimplementedAuthenticateAndPostServer
 // for forward compatibility
@@ -124,6 +184,12 @@ type AuthenticateAndPostServer interface {
 	FollowUser(context.Context, *FollowUserRequest) (*FollowUserResponse, error)
 	UnfollowUser(context.Context, *UnfollowUserRequest) (*UnfollowUserResponse, error)
 	GetFollowerList(context.Context, *GetFollowerListRequest) (*GetFollowerListResponse, error)
+	CreatePost(context.Context, *CreatePostRequest) (*CreatePostResponse, error)
+	GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
+	DeletePost(context.Context, *DeletePostRequest) (*DeletePostResponse, error)
+	EditPost(context.Context, *EditPostRequest) (*EditPostResponse, error)
+	CreatePostComment(context.Context, *CreatePostCommentRequest) (*CreatePostCommentResponse, error)
+	LikePost(context.Context, *LikePostRequest) (*LikePostResponse, error)
 	mustEmbedUnimplementedAuthenticateAndPostServer()
 }
 
@@ -154,6 +220,24 @@ func (UnimplementedAuthenticateAndPostServer) UnfollowUser(context.Context, *Unf
 }
 func (UnimplementedAuthenticateAndPostServer) GetFollowerList(context.Context, *GetFollowerListRequest) (*GetFollowerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFollowerList not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) CreatePost(context.Context, *CreatePostRequest) (*CreatePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPost not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) DeletePost(context.Context, *DeletePostRequest) (*DeletePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) EditPost(context.Context, *EditPostRequest) (*EditPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPost not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) CreatePostComment(context.Context, *CreatePostCommentRequest) (*CreatePostCommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePostComment not implemented")
+}
+func (UnimplementedAuthenticateAndPostServer) LikePost(context.Context, *LikePostRequest) (*LikePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LikePost not implemented")
 }
 func (UnimplementedAuthenticateAndPostServer) mustEmbedUnimplementedAuthenticateAndPostServer() {}
 
@@ -312,6 +396,114 @@ func _AuthenticateAndPost_GetFollowerList_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthenticateAndPost_CreatePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).CreatePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/CreatePost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).CreatePost(ctx, req.(*CreatePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_GetPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).GetPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/GetPost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).GetPost(ctx, req.(*GetPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_DeletePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).DeletePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/DeletePost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).DeletePost(ctx, req.(*DeletePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_EditPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).EditPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/EditPost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).EditPost(ctx, req.(*EditPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_CreatePostComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePostCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).CreatePostComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/CreatePostComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).CreatePostComment(ctx, req.(*CreatePostCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticateAndPost_LikePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticateAndPostServer).LikePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/authen_and_post.AuthenticateAndPost/LikePost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticateAndPostServer).LikePost(ctx, req.(*LikePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthenticateAndPost_ServiceDesc is the grpc.ServiceDesc for AuthenticateAndPost service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -350,6 +542,30 @@ var AuthenticateAndPost_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFollowerList",
 			Handler:    _AuthenticateAndPost_GetFollowerList_Handler,
+		},
+		{
+			MethodName: "CreatePost",
+			Handler:    _AuthenticateAndPost_CreatePost_Handler,
+		},
+		{
+			MethodName: "GetPost",
+			Handler:    _AuthenticateAndPost_GetPost_Handler,
+		},
+		{
+			MethodName: "DeletePost",
+			Handler:    _AuthenticateAndPost_DeletePost_Handler,
+		},
+		{
+			MethodName: "EditPost",
+			Handler:    _AuthenticateAndPost_EditPost_Handler,
+		},
+		{
+			MethodName: "CreatePostComment",
+			Handler:    _AuthenticateAndPost_CreatePostComment_Handler,
+		},
+		{
+			MethodName: "LikePost",
+			Handler:    _AuthenticateAndPost_LikePost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
