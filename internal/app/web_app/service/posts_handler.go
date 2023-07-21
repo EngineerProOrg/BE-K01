@@ -11,6 +11,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetPost godoc
+//
+//	@Summary		get post detail
+//	@Description	get post detail by post id
+//	@Tags			Post
+//	@Accept			json
+//	@Produce		json
+//	@Param			post_id path int true "post id"
+//	@Success		200	{object} types.PostDetailResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/posts/{post_id} [get]
 func (svc *WebService) GetPost(ctx *gin.Context) {
 	postId, err := strconv.ParseInt(ctx.Param("post_id"), 10, 64)
 	if err != nil {
@@ -38,6 +50,17 @@ func (svc *WebService) GetPost(ctx *gin.Context) {
 	})
 }
 
+// CreatePost godoc
+//
+//	@Summary		create new post
+//	@Description	create new post
+//	@Tags			Post
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/posts [post]
 func (svc *WebService) CreatePost(ctx *gin.Context) {
 	var jsonRequest types.CreatePostRequest
 	if err := ctx.ShouldBindJSON(&jsonRequest); err != nil {
@@ -61,6 +84,18 @@ func (svc *WebService) CreatePost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, types.MessageResponse{Message: fmt.Sprintf("create post successfully with id: %d", resp.PostId)})
 }
 
+// EditPost godoc
+//
+//	@Summary		edit post
+//	@Description	edit post by post id and new content text or new content image path or new visible
+//	@Tags			Post
+//	@Accept			json
+//	@Produce		json
+//	@Param			post_id path int true "post id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/posts/{post_id} [put]
 func (svc *WebService) EditPost(ctx *gin.Context) {
 	postId, err := strconv.ParseInt(ctx.Param("post_id"), 10, 64)
 	if err != nil {
@@ -95,6 +130,18 @@ func (svc *WebService) EditPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, types.MessageResponse{Message: fmt.Sprintf("edit post successfully with id: %d", postId)})
 }
 
+// DeletePost godoc
+//
+//	@Summary		delete post
+//	@Description	delete post by post id
+//	@Tags			Post
+//	@Accept			json
+//	@Produce		json
+//	@Param			post_id path int true "post id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/posts/{post_id} [delete]
 func (svc *WebService) DeletePost(ctx *gin.Context) {
 	postId, err := strconv.ParseInt(ctx.Param("post_id"), 10, 64)
 	if err != nil {
@@ -115,6 +162,18 @@ func (svc *WebService) DeletePost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, types.MessageResponse{Message: fmt.Sprintf("delete post successfully with id: %d", postId)})
 }
 
+// CreatePostComment godoc
+//
+//	@Summary		create post comment
+//	@Description	create post comment by post id and user id and content text
+//	@Tags			Post
+//	@Accept			json
+//	@Produce		json
+//	@Param			post_id path int true "post id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/posts/{post_id}/comments [post]
 func (svc *WebService) CreatePostComment(ctx *gin.Context) {
 	postId, err := strconv.ParseInt(ctx.Param("post_id"), 10, 64)
 	if err != nil {
@@ -159,6 +218,18 @@ func (svc *WebService) CreatePostComment(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, types.MessageResponse{Message: fmt.Sprintf("create post comment successfully with id: %d", resp.CommentId)})
 }
 
+// LikePost godoc
+//
+//	@Summary		like post
+//	@Description	like post by post id
+//	@Tags			Post
+//	@Accept			json
+//	@Produce		json
+//	@Param			post_id path int true "post id"
+//	@Success		200	{object} types.MessageResponse
+//	@Failure		400	{object} types.MessageResponse
+//	@Failure		500	{object} types.MessageResponse
+//	@Router			/posts/{post_id}/likes [post]
 func (svc *WebService) LikePost(ctx *gin.Context) {
 	postId, err := strconv.ParseInt(ctx.Param("post_id"), 10, 64)
 	if err != nil {
