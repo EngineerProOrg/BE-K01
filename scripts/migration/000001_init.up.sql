@@ -4,7 +4,7 @@ USE engineerpro;
 -- Create the user table
 CREATE TABLE user (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  hashed_password VARCHAR(50) NOT NULL,
+  hashed_password VARCHAR(256) NOT NULL,
   salt VARCHAR(20) NOT NULL,
   first_name VARCHAR(50) NOT NULL,
   last_name VARCHAR(50) NOT NULL,
@@ -21,9 +21,9 @@ CREATE TABLE post (
   content_image_path VARCHAR(255),
   user_id INT NOT NULL,
   visible BOOL NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL,
-  deleted_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP NULL,
+  updated_at TIMESTAMP NULL,
+  deleted_at TIMESTAMP NULL,
   FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
@@ -40,9 +40,9 @@ CREATE TABLE following (
 CREATE TABLE comment (
      id INT AUTO_INCREMENT PRIMARY KEY,
      content VARCHAR(255) NOT NULL,
-     created_at TIMESTAMP NOT NULL,
-     updated_at TIMESTAMP NOT NULL,
-     deleted_at TIMESTAMP NOT NULL,
+     created_at TIMESTAMP NULL,
+     updated_at TIMESTAMP NULL,
+     deleted_at TIMESTAMP NULL,
      user_id INT NOT NULL ,
      post_id INT NOT NULL ,
      FOREIGN KEY (user_id) REFERENCES user(id),
@@ -53,9 +53,6 @@ CREATE TABLE comment (
 CREATE TABLE `like` (
     user_id INT NOT NULL,
     post_id INT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (post_id) REFERENCES post(id),
     PRIMARY KEY (post_id, user_id)
