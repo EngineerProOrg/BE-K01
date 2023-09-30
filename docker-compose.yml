@@ -1,0 +1,20 @@
+version: 'latest'
+services:
+  db:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=BEK05
+      - MYSQL_USER=congson
+      - MYSQL_PASSWORD=123456
+    cap_add:
+      - SYS_NICE
+volumes:
+  db_data:
+    driver: local
